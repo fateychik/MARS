@@ -165,33 +165,109 @@ namespace WindowsFormsApplication1
         public Form1()
         {
             InitializeComponent();
-            DrawMap();
+            GetMode();
         }
 
         int x, y; //значения размерности
 		bool draw = false;
-        //test line to see how GIT works
 
         //отрисовка элементов карты
         int sideSize = 10; //размер стороны квадрата
         static int lineWidth = 1; //ширина линии квадрата
         int borderShift = 0; //сдвиг от границы окна
+
         PictureBox globalMapPictureBox = new PictureBox();
         Bitmap globalMap;
         Graphics globalMapGraphics;
+
+		Button saveButton = new Button ();
+		Button loadButton = new Button ();
+		Button createButton = new Button ();
+		Label xTrackBarLabel = new Label ();
+		Label yTrackBarLabel = new Label ();
+		TrackBar xTrackBar = new TrackBar ();
+		TrackBar yTrackBar = new TrackBar ();
+		Size buttonSize = new Size (100, 25);
+
         Pen emptyRectPen = new Pen(Color.Gray, lineWidth); //линия пустой клетки
         Pen takenRectPen = new Pen(Color.Black, lineWidth); //линия клетки-припятствия
-        //Pen pathRectPen = new Pen(Color.Red, lineWidth); //линия клетки-маршрута
-        SolidBrush BlackRectBrush = new SolidBrush(Color.Black); //зарисовка занятой клетки
-        //SolidBrush RedRectBrush = new SolidBrush(Color.Red); //зарисовка клетки маршрута
+        SolidBrush takenRectBrush = new SolidBrush(Color.Black); //зарисовка занятой клетки
         //
 
+
+		void GetMode()
+		{
+			this.Size = new Size(500, 350); //окно программы
+
+			loadButton.Location = new Point (10, 10);
+			loadButton.Size = buttonSize;
+			loadButton.Text = "Загрузить";
+			loadButton.MouseClick += new MouseEventHandler (LoadButtonClick);
+			Controls.Add (loadButton);
+
+			saveButton.Location = new Point (125, 10);
+			saveButton.Size = buttonSize;
+			saveButton.Text = "Сохранить";
+			saveButton.MouseClick += new MouseEventHandler (SaveButtonClick);
+			Controls.Add (saveButton);
+
+			createButton.Location = new Point (240, 10);
+			createButton.Size = buttonSize;
+			createButton.Text = "Создать";
+			createButton.MouseClick += new MouseEventHandler (CreateButtonClick);
+			Controls.Add (createButton);
+
+			xTrackBarLabel.Location = new Point (10, 50);
+			xTrackBarLabel.Size = new Size(40,20);
+			Controls.Add (xTrackBarLabel);
+
+			xTrackBar.Location = new Point (50, 50);
+			xTrackBar.Minimum = 10;
+			xTrackBar.Maximum = 100;
+			xTrackBar.TickFrequency = 10;
+			xTrackBar.Scroll += TrackBarScroll;
+			Controls.Add (xTrackBar);
+
+			yTrackBarLabel.Location = new Point (170, 50);
+			yTrackBarLabel.Size = new Size(40,20);
+			Controls.Add (yTrackBarLabel);
+
+			yTrackBar.Location = new Point (210, 50);
+			yTrackBar.Minimum = 10;
+			yTrackBar.Maximum = 100;
+			yTrackBar.TickFrequency = 10;
+			yTrackBar.Scroll += TrackBarScroll;
+			Controls.Add (yTrackBar);
+		}
+
+		void TrackBarScroll (object sender, EventArgs e)
+		{
+			x = xTrackBar.Value;
+			y = yTrackBar.Value;
+			xTrackBarLabel.Text = String.Format ("X: {0}", xTrackBar.Value);
+			yTrackBarLabel.Text = String.Format ("Y: {0}", yTrackBar.Value);
+		}
+
+		void LoadButtonClick(object sender, EventArgs e)
+		{
+
+		}
+
+		void SaveButtonClick(object sender, EventArgs e)
+		{
+		
+		}
+	
+		void CreateButtonClick(object sender, EventArgs e)
+		{
+			Controls.Clear();
+			DrawMap ();
+		}
 
         // начало отрисовки интерфейса и карты
         void DrawMap()
         {
-			x = 100;
-			y = 100;
+
 			globalMapPictureBox.MouseMove += new MouseEventHandler(GlobalMapMouseMove);
 			globalMapPictureBox.MouseUp += new MouseEventHandler(GlobalMapMouseUp);
 			globalMapPictureBox.MouseDown += new MouseEventHandler(GlobalMapMouseDown);
@@ -199,11 +275,14 @@ namespace WindowsFormsApplication1
 
             emptyRectPen.Alignment = PenAlignment.Inset;
             takenRectPen.Alignment = PenAlignment.Inset;
+
             this.Size = new Size(x * sideSize + 30, y * sideSize + 30); //окно программы
-            globalMapPictureBox.Size = new Size(x * sideSize + 20, y * sideSize + 20); //окно карты
+
+            globalMapPictureBox.Size = new Size(x * sideSize+1, y * sideSize+1); //окно карты
 			Controls.Add(globalMapPictureBox);
-            globalMap = new Bitmap(x * sideSize + 20, y * sideSize + 20);
+            globalMap = new Bitmap(x * sideSize+1, y * sideSize+1);
 			globalMapGraphics = Graphics.FromImage(globalMap);
+
             for (int i = 0; i < y; i++) //отрисовка пустой карты
             {
                 for (int j = 0; j < x; j++)
@@ -211,37 +290,22 @@ namespace WindowsFormsApplication1
 					globalMapGraphics.DrawRectangle(emptyRectPen, j * (sideSize) + borderShift, i * (sideSize) + borderShift, sideSize, sideSize);
 				}
             }
-			globalMapGraphics.FillRectangle (BlackRectBrush, 0,0,1,1);
 
 			globalMapPictureBox.Image = globalMap;
 
-			//globalMapPictureBox.MouseClick (ClickOnMap);
         } //отрисовка карты
         //конец отрисовки интерфейса и карты
-
-		private void ClickOnMap(object sender, MouseEventArgs e)
-		{
-			int squareX = e.X / sideSize;
-			int squareY = e.Y / sideSize;
-			globalMapGraphics.FillRectangle (BlackRectBrush, squareX*sideSize, squareY*sideSize, sideSize, sideSize);
-			globalMapPictureBox.Image = globalMap;
-			Console.Write (e.X);
-			Console.Write (" ");
-			Console.WriteLine (e.Y);
-			Console.Write (squareX*sideSize);
-			Console.Write (" ");
-			Console.WriteLine (squareY*sideSize);
-		}
-
-	
 
 		private void GlobalMapMouseMove(object sender, MouseEventArgs e)
 		{
 			if (draw)
 			{
+				//Console.Write (e.X);
+				//Console.Write ("\t");
+				//Console.WriteLine (e.Y);
 				int squareX = e.X / sideSize;
 				int squareY = e.Y / sideSize;
-				globalMapGraphics.FillRectangle (BlackRectBrush, squareX*sideSize, squareY*sideSize, sideSize, sideSize);
+				globalMapGraphics.FillRectangle (takenRectBrush, squareX*sideSize, squareY*sideSize, sideSize, sideSize);
 				globalMapPictureBox.Image = globalMap;
 			}
 		}
