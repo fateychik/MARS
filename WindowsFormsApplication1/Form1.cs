@@ -170,7 +170,7 @@ namespace WindowsFormsApplication1
 
         int x, y; //значения размерности
 		bool draw = false;
-        //
+        //test line to see how GIT works
 
         //отрисовка элементов карты
         int sideSize = 10; //размер стороны квадрата
