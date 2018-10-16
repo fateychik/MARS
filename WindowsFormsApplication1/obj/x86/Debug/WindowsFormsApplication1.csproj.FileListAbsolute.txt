@@ -1,0 +1,52 @@
+C:\Users\denis\documents\visual studio 2010\Projects\WindowsFormsApplication1\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe
+C:\Users\denis\documents\visual studio 2010\Projects\WindowsFormsApplication1\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.pdb
+C:\Users\denis\documents\visual studio 2010\Projects\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Properties.Resources.resources
+C:\Users\denis\documents\visual studio 2010\Projects\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.csproj.GenerateResource.Cache
+C:\Users\denis\documents\visual studio 2010\Projects\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
+C:\Users\denis\documents\visual studio 2010\Projects\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
+C:\Users\denis\documents\visual studio 2010\Projects\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Form1.resources
+C:\Users\cpd\Desktop\Projects\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
+C:\Users\cpd\Desktop\Projects\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
+C:\Users\cpd\Desktop\Projects\Отрисовка карты\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe
+C:\Users\cpd\Desktop\Projects\Отрисовка карты\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.pdb
+C:\Users\cpd\Desktop\Projects\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Graph.resources
+C:\Users\cpd\Desktop\Projects\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Properties.Resources.resources
+C:\Users\cpd\Desktop\Projects\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.csproj.GenerateResource.Cache
+C:\Users\denis\Documents\Visual Studio 2010\Projects\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
+C:\Users\denis\Documents\Visual Studio 2010\Projects\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
+C:\Users\denis\Documents\Visual Studio 2010\Projects\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe
+C:\Users\denis\Documents\Visual Studio 2010\Projects\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.pdb
+C:\Users\denis\Documents\Visual Studio 2010\Projects\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.csprojResolveAssemblyReference.cache
+C:\Users\denis\Documents\Visual Studio 2010\Projects\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Graph.resources
+C:\Users\denis\Documents\Visual Studio 2010\Projects\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Properties.Resources.resources
+C:\Users\denis\Documents\Visual Studio 2010\Projects\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.csproj.GenerateResource.Cache
+K:\Управление\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
+K:\Управление\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
+C:\Users\labuser\Desktop\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
+C:\Users\labuser\Desktop\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
+C:\Users\labuser\Desktop\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe
+C:\Users\labuser\Desktop\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.pdb
+C:\Users\labuser\Desktop\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.csprojResolveAssemblyReference.cache
+C:\Users\labuser\Desktop\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Graph.resources
+C:\Users\labuser\Desktop\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Properties.Resources.resources
+C:\Users\labuser\Desktop\Projects 25FEB\Отрисовка карты\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.csproj.GenerateResource.Cache
+D:\Управление\05MAR\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
+D:\Управление\05MAR\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\05MAR\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\05MAR\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\05MAR\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\05MAR\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.pdb
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\05MAR\WindowsFormsApplication1\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\05MAR\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Graph.resources
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\05MAR\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Properties.Resources.resources
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\05MAR\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\05MAR\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\14MAR\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\14MAR\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\14MAR\WindowsFormsApplication1\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\14MAR\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Graph.resources
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\14MAR\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Properties.Resources.resources
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\14MAR\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\14MAR\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\14MAR\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe
+C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\14MAR\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.pdb

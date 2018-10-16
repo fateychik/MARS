@@ -1,0 +1,28 @@
+/home/denis/Университет/Управление/Projects/14MAR/WindowsFormsApplication1/obj/x86/Debug/.NETFramework,Version=v4.0,Profile=Client.AssemblyAttribute.cs
+/home/denis/Университет/Управление/Projects/14MAR/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.Graph.resources
+/home/denis/Университет/Управление/Projects/14MAR/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.Properties.Resources.resources
+/home/denis/Университет/Управление/Projects/14MAR/WindowsFormsApplication1/bin/Debug/WindowsFormsApplication1.exe.mdb
+/home/denis/Университет/Управление/Projects/14MAR/WindowsFormsApplication1/bin/Debug/WindowsFormsApplication1.exe
+/home/denis/Университет/Управление/Projects/14MAR/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.exe
+/home/denis/Университет/Управление/Projects/14MAR/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.exe.mdb
+/mnt/EC1E11401E11056C/Университет/4 курс/Управление/Волновой алгоритм/14MAR/WindowsFormsApplication1/obj/x86/Debug/.NETFramework,Version=v4.0,Profile=Client.AssemblyAttribute.cs
+/mnt/EC1E11401E11056C/Университет/4 курс/Управление/Волновой алгоритм/14MAR/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.Graph.resources
+/mnt/EC1E11401E11056C/Университет/4 курс/Управление/Волновой алгоритм/14MAR/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.Properties.Resources.resources
+/mnt/EC1E11401E11056C/Университет/4 курс/Управление/Волновой алгоритм/14MAR/WindowsFormsApplication1/bin/Debug/WindowsFormsApplication1.exe.mdb
+/mnt/EC1E11401E11056C/Университет/4 курс/Управление/Волновой алгоритм/14MAR/WindowsFormsApplication1/bin/Debug/WindowsFormsApplication1.exe
+/mnt/EC1E11401E11056C/Университет/4 курс/Управление/Волновой алгоритм/14MAR/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.exe
+/mnt/EC1E11401E11056C/Университет/4 курс/Управление/Волновой алгоритм/14MAR/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.exe.mdb
+/home/denis/Университет/Навигация/14MAR/WindowsFormsApplication1/obj/x86/Debug/.NETFramework,Version=v4.0,Profile=Client.AssemblyAttribute.cs
+/home/denis/Университет/Навигация/14MAR/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.Graph.resources
+/home/denis/Университет/Навигация/14MAR/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.Properties.Resources.resources
+/home/denis/Университет/Навигация/14MAR/WindowsFormsApplication1/bin/Debug/WindowsFormsApplication1.exe.mdb
+/home/denis/Университет/Навигация/14MAR/WindowsFormsApplication1/bin/Debug/WindowsFormsApplication1.exe
+/home/denis/Университет/Навигация/14MAR/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.exe
+/home/denis/Университет/Навигация/14MAR/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.exe.mdb
+/home/denis/Университет/Навигация/14MAR (копия)/WindowsFormsApplication1/obj/x86/Debug/.NETFramework,Version=v4.0,Profile=Client.AssemblyAttribute.cs
+/home/denis/Университет/Навигация/14MAR (копия)/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.Graph.resources
+/home/denis/Университет/Навигация/14MAR (копия)/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.Properties.Resources.resources
+/home/denis/Университет/Навигация/14MAR (копия)/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.exe
+/home/denis/Университет/Навигация/14MAR (копия)/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.exe.mdb
+/home/denis/Университет/Навигация/14MAR (копия)/WindowsFormsApplication1/bin/Debug/WindowsFormsApplication1.exe.mdb
+/home/denis/Университет/Навигация/14MAR (копия)/WindowsFormsApplication1/bin/Debug/WindowsFormsApplication1.exe
