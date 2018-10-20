@@ -33,3 +33,11 @@
 /home/denis/Университет/Навигация/GIT/MARS/WindowsFormsApplication1/bin/Debug/WindowsFormsApplication1.exe
 /home/denis/Университет/Навигация/GIT/MARS/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.exe
 /home/denis/Университет/Навигация/GIT/MARS/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.exe.mdb
+/home/denis/Университет/Навигация/Project/WindowsFormsApplication1/obj/x86/Debug/.NETFramework,Version=v4.0,Profile=Client.AssemblyAttribute.cs
+/home/denis/Университет/Навигация/Project/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.Graph.resources
+/home/denis/Университет/Навигация/Project/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.Properties.Resources.resources
+/home/denis/Университет/Навигация/Project/WindowsFormsApplication1/bin/Debug/WindowsFormsApplication1.exe.mdb
+/home/denis/Университет/Навигация/Project/WindowsFormsApplication1/bin/Debug/WindowsFormsApplication1.exe
+/home/denis/Университет/Навигация/Project/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.exe
+/home/denis/Университет/Навигация/Project/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.exe.mdb
+/home/denis/Университет/Навигация/Project/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.Form1.resources
