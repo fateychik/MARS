@@ -107,7 +107,7 @@ namespace WindowsFormsApplication1
 
 		void SaveButtonClick(object sender, EventArgs e)
 		{
-
+            string fileName = System.IO.Path.Combine(@"c:\MARS maps", System.IO.Path.GetRandomFileName());
 		} //нажание на кнопку сохранения
 
 		void CreateButtonClick(object sender, EventArgs e)
