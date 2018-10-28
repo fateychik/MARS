@@ -191,5 +191,19 @@ namespace WindowsFormsApplication1
                 rightMouseButton = false;
             }
 		}
+
+        public int[] Surroundings(int xCoord, int yCoord)
+        {
+            int[] surMap = new int[9];
+            int a=0;
+            for (int i = yCoord - 1; i <= yCoord + 1; i++)
+            {
+                for (int j = xCoord - 1; j <= xCoord + 1; j++)
+                {
+                    surMap[a++] = mapArray[i, j];
+                }
+            }
+            return surMap;
+        }
 	}
 }

@@ -22,5 +22,27 @@ namespace WindowsFormsApplication1
             free = new List<int>();
             busy = new List<int>();
         }
+
+        private void MapBuild()
+        {
+            foreach (Robot robot in robots)
+            {
+                (int x, int y) robotCoordinates = robot.GetCoordinates(true);
+
+                int[] robotSurroundings = robot.GetSurroundings();
+
+                int a = 0;
+                for (int i = robotCoordinates.y - 1; i <= robotCoordinates.y + 1; i++)
+                {
+                    for (int j = robotCoordinates.x - 1; j <= robotCoordinates.x + 1; j++)
+                    {
+                        map[i, j] = robotSurroundings[a++];
+                    }
+                }
+
+                (int x, int y) robotPrevCoordinates = robot.GetCoordinates(false);
+                
+            }
+        }
     }
 }
