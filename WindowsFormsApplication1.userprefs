@@ -1,9 +1,11 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="WindowsFormsApplication1/Form1.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="WindowsFormsApplication1/Robot.cs">
     <Files>
-      <File FileName="WindowsFormsApplication1/Form1.cs" Line="170" Column="135" />
+      <File FileName="WindowsFormsApplication1/Form1.cs" Line="1" Column="1" />
       <File FileName="WindowsFormsApplication1/Graph.cs" Line="1" Column="1" />
+      <File FileName="WindowsFormsApplication1/OpSystem.cs" Line="1" Column="1" />
+      <File FileName="WindowsFormsApplication1/Robot.cs" Line="23" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

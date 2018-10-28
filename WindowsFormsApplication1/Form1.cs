@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -157,7 +157,7 @@ namespace WindowsFormsApplication1
 				int squareY = e.Y / sideSize;
                 if (squareX < x && squareY < y && squareX >= 0 && squareY >= 0)
                 {
-                    if (rightMouseButton)
+                    if (!rightMouseButton)
                     {
                         mapArray[squareY, squareX] = 0;
                         globalMapGraphics.FillRectangle(emptyRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);

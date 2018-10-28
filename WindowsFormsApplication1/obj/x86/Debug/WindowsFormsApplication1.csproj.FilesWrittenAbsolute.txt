@@ -41,3 +41,4 @@
 /home/denis/Университет/Навигация/Project/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.exe
 /home/denis/Университет/Навигация/Project/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.exe.mdb
 /home/denis/Университет/Навигация/Project/WindowsFormsApplication1/obj/x86/Debug/WindowsFormsApplication1.Form1.resources
+/home/denis/Университет/Навигация/Project/WindowsFormsApplication1/obj/x86/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
