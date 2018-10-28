@@ -50,3 +50,15 @@ C:\Documents and Settings\Денис\Мои документы\Visual Studio 201
 C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\14MAR\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.write.1.tlog
 C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\14MAR\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe
 C:\Documents and Settings\Денис\Мои документы\Visual Studio 2010\Projects\14MAR\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.pdb
+C:\Users\Clark\Documents\GitHub\MARS\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe
+C:\Users\Clark\Documents\GitHub\MARS\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.pdb
+C:\Users\Clark\Documents\GitHub\MARS\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.csprojAssemblyReference.cache
+C:\Users\Clark\Documents\GitHub\MARS\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Properties.Resources.resources
+C:\Users\Clark\Documents\GitHub\MARS\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.csproj.GenerateResource.cache
+C:\Users\Clark\Documents\GitHub\MARS\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.csproj.CoreCompileInputs.cache
+C:\Users\Clark\Documents\GitHub\MARS\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
+C:\Users\Clark\Documents\GitHub\MARS\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
+C:\Users\Clark\Documents\GitHub\MARS\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Form1.resources
+C:\Users\Clark\Documents\GitHub\MARS\WindowsFormsApplication1\bin\Debug\System.ValueTuple.dll
+C:\Users\Clark\Documents\GitHub\MARS\WindowsFormsApplication1\bin\Debug\System.ValueTuple.xml
+C:\Users\Clark\Documents\GitHub\MARS\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.csproj.CopyComplete
