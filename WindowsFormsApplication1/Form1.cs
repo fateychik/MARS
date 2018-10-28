@@ -140,7 +140,7 @@ namespace WindowsFormsApplication1
 				{
                     globalMapGraphics.FillRectangle(takenRectBrush, j * (sideSize), i * (sideSize), sideSize + 1, sideSize + 1);
                     globalMapGraphics.DrawRectangle(emptyRectPen, j * (sideSize), i * (sideSize), sideSize, sideSize);
-                    mapArray[j, i] = 1;
+                    mapArray[i, j] = 1;
 				}
 			}
 
