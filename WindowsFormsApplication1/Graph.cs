@@ -1,162 +1,247 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
-using System.Drawing.Drawing2D;
 
 namespace WindowsFormsApplication1
 {
-	public class Graph
-	{
-		private SortedDictionary<string, int> verticies = new SortedDictionary<string, int>();
+    class Graph
+    {
+        private float[][] adjMatrix;
+        private Dictionary<string, int> vertex;
+        private Dictionary<int, string> reversVertex;
 
-		private int[][] adjecencyMatrix = new int[0][];
+        public Graph()
+        {
+            vertex = new Dictionary<string, int>();
+            reversVertex = new Dictionary<int, string>();
+            adjMatrix = new float[0][];
+        }
 
-		public void AddVertex(string vertex)
-		{
-			if (verticies.ContainsKey(vertex))
-			{
-				Console.WriteLine("Vertex already exists");
-				return;
-			}
+        public void AddVertex(string V)
+        {
+            //Console.WriteLine("Adding vertex " + V);
 
-			verticies.Add(vertex, verticies.Count);
-			Array.Resize(ref adjecencyMatrix, verticies.Count);
-			for (int i = 0; i < verticies.Count; i++)
-			{
-				Array.Resize(ref adjecencyMatrix[i], verticies.Count);
-			}
-			adjecencyMatrix[verticies.Count - 1] = new int[verticies.Count];
-			//Console.WriteLine("Add {0} : {1}", vertex, verticies[vertex]);
-		}
+            if (vertex.ContainsKey(V))
+            {
+                //Console.WriteLine("The element already exists");
+            }
+            else
+            {
+                vertex.Add(V, adjMatrix.Length);
+                reversVertex.Add(adjMatrix.Length, V);
 
-		public void RemoveVertex(string vertex)
-		{
-			if (!verticies.ContainsKey(vertex))
-			{
-				Console.WriteLine("No such vertex");
-			}
-			else
-			{
-				//Console.WriteLine("Remove {0}", vertex);
-				for (int i = 0; i < verticies.Count; i++)
-				{
-					RemoveAt(ref adjecencyMatrix[i], verticies[vertex]);
-				}
+                Array.Resize(ref adjMatrix, adjMatrix.Length + 1);
+                adjMatrix[adjMatrix.Length - 1] = new float[adjMatrix.Length];
+                for (int i = 0; i < adjMatrix.Length; i++)
+                    Array.Resize(ref adjMatrix[i], adjMatrix.Length);
+            }
+        }
 
-				for (int i = 0; i < verticies.Count; i++)
-				{
-					if (verticies.ElementAt(i).Value > verticies[vertex])
-					{
-						verticies[verticies.ElementAt(i).Key]--;
-					}
-				}
-				verticies.Remove(vertex);
-			}
-		}
+        public void RemoveVertex(string V)
+        {
+            //Console.WriteLine("\nRemoving vertex " + V);
 
-		public static void RemoveAt<T>(ref T[] arr, int index)
-		{
-			for (int a = index; a < arr.Length - 1; a++)
-			{
-				arr[a] = arr[a + 1];
-			}
-			Array.Resize(ref arr, arr.Length - 1);
-		}
+            int value = 0;
+            if (vertex.ContainsKey(V))
+                value = vertex[V];
 
-		public void AddEdge(string vertex1, string vertex2, int weight = 1)
-		{
-			if (!verticies.ContainsKey(vertex1) || !verticies.ContainsKey(vertex2))
-			{
-				Console.WriteLine("Vertex doesn't exist");
-				return;
-			}
+            if (!vertex.Remove(V))
+            {
+                //Console.WriteLine("The element doesnt exist");
+                return;
+            }
 
-			adjecencyMatrix[verticies[vertex1]][verticies[vertex2]] = weight;
-			adjecencyMatrix[verticies[vertex2]][verticies[vertex1]] = weight;
-		}
+            for (int i = value + 1; i < reversVertex.Count; i++)
+                vertex[reversVertex[i]] = i - 1;
 
-		public void RemoveEdge(string vertex1, string vertex2)
-		{
-			AddEdge(vertex1, vertex2, 0);
-		}
+            MakeReversDictionary();
 
-		public T GetAdjecency<T>(string vertex1, string vertex2)
-		{
-			if (!verticies.ContainsKey(vertex1) || !verticies.ContainsKey(vertex2))
-			{
-				Console.WriteLine("Vertex doesn't exist");
-				return default(T);
-			}
+            Array.Resize(ref adjMatrix, adjMatrix.Length - 1);
+            adjMatrix[adjMatrix.Length - 1] = new float[adjMatrix.Length];
+            for (int i = 0; i < adjMatrix.Length; i++)
+                Array.Resize(ref adjMatrix[i], adjMatrix.Length);
+        }
 
-			return (T)Convert.ChangeType(adjecencyMatrix[verticies[vertex1]][verticies[vertex2]], typeof(T));
-		}
+        private void MakeReversDictionary()
+        {
+            reversVertex.Clear();
+            int j = 0;
+            foreach (string i in vertex.Keys)
+            {
+                reversVertex.Add(j, i);
+                j++;
+            }
+        }
 
-		public List<string> GetNeighbours(string vertex)
-		{
-			if (!verticies.ContainsKey(vertex))
-			{
-				Console.WriteLine("Vertex doesn't exist");
-				return new List<string>();
-			}
+        public void AddEdge(string A, string B, float w)
+        {
+            //Console.WriteLine("\nAdding edge " + A + B + " with weight " + w);
 
-			var output = new List<string>();
-			var inverseDictionary = GetInverseVertexDictionary();
-			for (int i = 0; i < verticies.Count; i++)
-			{
-				if (adjecencyMatrix[verticies[vertex]][i] != 0)
-				{
-					output.Add(inverseDictionary[i]);
-				}
-			}
-			//Console.WriteLine("Neighbours of {0}:", vertex);
-			//output.ForEach(Console.WriteLine);
-			//Console.WriteLine();
-			return output;
-		}
+            if (A == B || !vertex.ContainsKey(A) || !vertex.ContainsKey(B) || w == 0)
+            {
+                //Console.WriteLine("\nnet");
+                return;
+            }
 
-		public void PrintMatrix()
-		{
-			var inverseDictionary = GetInverseVertexDictionary();
-			Console.Write(" \t");
-			for (int i = 0; i < verticies.Count; i++)
-			{
-				Console.Write(inverseDictionary[i] + "\t");
-			}
-			Console.WriteLine();
-			for (int i = 0; i < verticies.Count; i++)
-			{
-				Console.Write(inverseDictionary[i] + "\t");
-				for (int j = 0; j < verticies.Count; j++)
-				{
-					Console.Write("{0}\t", adjecencyMatrix[i][j]);
-				}
-				Console.WriteLine();
-			}
-		} //1=есть связь, 0=нет связи
+            adjMatrix[vertex[A]][vertex[B]] = w;
+            adjMatrix[vertex[B]][vertex[A]] = w;
+        }
 
-		public void PrintVerticies()
-		{
-			foreach (var kvp in verticies)
-			{
-				Console.WriteLine(kvp);
-			}
-		}
+        public void RemoveEdge(string A, string B)
+        {
+            //Console.WriteLine("\nRemoving edge " + A + B);
 
-		private Dictionary<int, string> GetInverseVertexDictionary()
-		{
-			var output = new Dictionary<int, string>();
-			foreach (var kvp in verticies)
-			{
-				output[kvp.Value] = kvp.Key;
-			}
+            adjMatrix[vertex[A]][vertex[B]] = 0;
+            //Console.WriteLine("the edge has been deleted");
+        }
 
-			return output;
-		}
-	}
+        public T Adjacency<T>(string A, string B)
+        {
+
+            if (A == B || !vertex.ContainsKey(A) || !vertex.ContainsKey(B))
+            {
+                //Console.WriteLine("\nfalse");
+
+                int i = 0;
+                return (T)Convert.ChangeType(i, typeof(T));
+            }
+            else return (T)Convert.ChangeType(adjMatrix[vertex[A]][vertex[B]], typeof(T));
+        }
+
+        public List<string> Neibours(string A)
+        {
+            //Console.Write("\nNeibours of " + A + ": ");
+            List<string> neibour = new List<string>();
+
+            if (!vertex.ContainsKey(A)) return neibour;
+
+            for (int i = 0; i < adjMatrix.Length; i++)
+            {
+                if (adjMatrix[vertex[A]][i] != 0) neibour.Add(reversVertex[i]);
+            }
+            return neibour;
+        }
+
+        public void PrintMatrix()
+        {
+            Console.Write("\n" + " ");
+
+            foreach (string i in vertex.Keys)
+                Console.Write(" " + i);
+
+            Console.WriteLine();
+
+            for (int i = 0; i < adjMatrix.Length; i++)
+            {
+                Console.Write(reversVertex[i]);
+
+                for (int j = 0; j < adjMatrix.Length; j++)
+                    Console.Write(" " + adjMatrix[i][j]);
+                Console.WriteLine();
+            }
+        }
+
+        public List<string> VertexList()
+        {
+            List<string> vertexList = new List<string>();
+            foreach (string i in vertex.Keys)
+            {
+                vertexList.Add(i);
+            }
+
+            return vertexList;
+        }
+
+        public List<string> WideWidthSearch(string start, string goal, out float distance)
+        {
+            Dictionary<string, string> ways = new Dictionary<string, string>();
+            List<string> visitedVertex = new List<string>();
+            Queue<string> seach = new Queue<string>();
+            List<string> temp;
+            distance = 0;
+
+            ways.Add(start, start); // present / last
+            seach.Enqueue(start);
+
+            while (!visitedVertex.Contains(goal))
+            {
+                temp = Neibours(seach.Peek());
+                visitedVertex.Add(seach.Peek());
+
+                foreach (string i in temp)
+                {
+                    if (visitedVertex.Contains(i)) continue;
+                    if (!ways.ContainsKey(i))
+                    {
+                        ways.Add(i, seach.Peek());
+                        seach.Enqueue(i);
+                    }
+                }
+                seach.Dequeue();
+            }
+            seach.Clear();
+
+            temp = new List<string>();
+            temp.Add(ways[goal]);
+            int j = 0;
+
+            while (!temp.Contains(start))
+            {
+                temp.Add(ways[temp[j]]);
+                j++;
+                distance += adjMatrix[j][j - 1];
+            }
+
+            return temp;
+        }
+
+        public List<string> Dijkstar()
+        {
+            Dictionary<string, string> way = new Dictionary<string, string>(); // present / last
+            Dictionary<string, float> wayLenght = new Dictionary<string, float>();
+            Dictionary<string, float> seach = new Dictionary<string, float>();
+
+            seach.Add(vertex.First().Key, 0f);
+            wayLenght.Add(vertex.First().Key, 0f);
+
+            while (seach.Count != 0)
+            {
+                var temp = seach.First(s => s.Value == seach.Values.Min()).Key;
+
+                foreach (string i in Neibours(temp))
+                {
+                    var value = Adjacency<float>(temp, i) + wayLenght[temp];
+                    if (!wayLenght.ContainsKey(i))
+                    {
+                        seach.Add(i, value);
+                        wayLenght.Add(i, value);
+                        way.Add(i, temp);
+                    }
+                    else
+                    {
+                        if (value <= wayLenght[i])
+                        {
+                            seach[i] = value;
+                            wayLenght[i] = value;
+                            way[i] = temp;
+                        }
+                    }
+                }
+                seach.Remove(temp);
+            }
+
+            List<string> temp_ = new List<string>();
+            temp_.Add(vertex.First(s => s.Value == vertex.Values.Max()).Key);
+            int j = 0;
+
+            while (!temp_.Contains(reversVertex[0]))
+            {
+                temp_.Add(way[temp_[j]]);
+                j++;
+            }
+
+            return temp_;
+        }
+    }
 }
-
