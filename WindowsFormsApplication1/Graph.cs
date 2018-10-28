@@ -192,6 +192,7 @@ namespace WindowsFormsApplication1
                 j++;
                 distance += adjMatrix[j][j - 1];
             }
+            temp.Reverse();
 
             return temp;
         }
