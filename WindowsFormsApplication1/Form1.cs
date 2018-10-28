@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
+using System.IO;
 
 namespace WindowsFormsApplication1
 {
@@ -102,13 +103,33 @@ namespace WindowsFormsApplication1
 
 		void LoadButtonClick(object sender, EventArgs e)
 		{
+            var file = File.ReadAllLines(@"E:\map" + ".txt"); // хз как путь выбирать(мб создать меню с имеющимися файлами)
+            mapArray = new int[file.Length, file[0].Length / 2];
 
-		} //нажание на кнопку загрузки
+            for (int i = 0; i < file.Length; i++)
+            {
+                var temp = file[i].Split(' ');
+                for (int j = 0; j < temp.Length; j++)
+                    mapArray[i, j] = int.Parse(temp[j]);
+            }
+
+            DrawMap();
+        } //нажание на кнопку загрузки
 
 		void SaveButtonClick(object sender, EventArgs e)
 		{
             string fileName = System.IO.Path.Combine(@"c:\MARS maps", System.IO.Path.GetRandomFileName());
-		} //нажание на кнопку сохранения
+
+            using (StreamWriter map = new StreamWriter(fileName + ".txt", true, System.Text.Encoding.Default))
+            {
+                for (int i = 0; i < mapArray.GetLength(0); i++)
+                {
+                    for (int j = 0; j < mapArray.GetLength(1); j++)
+                        map.Write(mapArray[i, j] + " ");
+                    map.WriteLine();
+                }
+            }
+        } //нажание на кнопку сохранения
 
 		void CreateButtonClick(object sender, EventArgs e)
 		{
@@ -179,7 +200,12 @@ namespace WindowsFormsApplication1
 			draw = false;
 		}
 
-		private void GlobalMapMouseDown(object sender, MouseEventArgs e)
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void GlobalMapMouseDown(object sender, MouseEventArgs e)
 		{
 			draw = true;
             if (e.Button == MouseButtons.Right)

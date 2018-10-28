@@ -32,7 +32,7 @@ namespace WindowsFormsApplication1
             int bufDistance = int.MaxValue;
             List<string> path = new List<string>();
 
-            while(tasks.Any() || free.Any())
+            while (tasks.Any() || free.Any())
             {
                 var task = tasks.Dequeue();
                 var goal = $"{task.x}_{task.y}";
@@ -52,6 +52,14 @@ namespace WindowsFormsApplication1
             }
         }
 
-        
+        public void CoordIncrement()
+        {
+            foreach (int i in busy)
+            {
+                var path = robots[i].path[0].Split('_');
+                robots[i].coordinates = (int.Parse(path[0]), int.Parse(path[1]));
+                robots[i].path.RemoveAt(0);
+            }
+        }
     }
 }
