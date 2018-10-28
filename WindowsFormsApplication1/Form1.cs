@@ -128,7 +128,7 @@ namespace WindowsFormsApplication1
 
 			this.Size = new Size(x * sideSize + 300, y * sideSize + 150); //окно программы
 
-			globalMapPictureBox.Location = new Point (10, 100);
+			globalMapPictureBox.Location = new Point (10, 100); //размещение карты в окне
 			globalMapPictureBox.Size = new Size(x * sideSize+1, y * sideSize+1); //окно карты
 			Controls.Add(globalMapPictureBox);
 			globalMap = new Bitmap(x * sideSize+1, y * sideSize+1);
@@ -138,7 +138,9 @@ namespace WindowsFormsApplication1
 			{
 				for (int j = 0; j < x; j++)
 				{
-					globalMapGraphics.DrawRectangle(emptyRectPen, j * (sideSize), i * (sideSize), sideSize, sideSize);
+                    globalMapGraphics.FillRectangle(takenRectBrush, j * (sideSize), i * (sideSize), sideSize + 1, sideSize + 1);
+                    globalMapGraphics.DrawRectangle(emptyRectPen, j * (sideSize), i * (sideSize), sideSize, sideSize);
+                    mapArray[j, i] = 1;
 				}
 			}
 
@@ -153,7 +155,7 @@ namespace WindowsFormsApplication1
 			{
 				int squareX = e.X / sideSize;
 				int squareY = e.Y / sideSize;
-                if (squareX < x && squareY < y)
+                if (squareX < x && squareY < y && squareX >= 0 && squareY >= 0)
                 {
                     if (rightMouseButton)
                     {
@@ -165,6 +167,7 @@ namespace WindowsFormsApplication1
                     {
                         mapArray[squareY, squareX] = 1;
                         globalMapGraphics.FillRectangle(takenRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
+                        globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
                     }
                     globalMapPictureBox.Image = globalMap;
                 }
