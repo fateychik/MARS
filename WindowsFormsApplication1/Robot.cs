@@ -7,13 +7,13 @@ namespace WindowsFormsApplication1
 {
     class Robot
     {
-        bool status; // 1-свободен 0-занят
-        (int x, int y) coordinates;
-        List<int> path;
+        public bool status; // 1-свободен 0-занят
+        public (int x, int y) coordinates;
+        public List<string> path;
 
         public Robot()
         {
-            path = new List<int>();
+            path = new List<string>();
             coordinates.x = 0;
             coordinates.y = 0;
             status = true;
