@@ -24,6 +24,7 @@ namespace WindowsFormsApplication1
 		bool draw = false;
         bool rightMouseButton = false;
 		int[,] mapArray;
+        Graph mapGraph = new Graph();
 
 		//отрисовка элементов карты
 		int sideSize = 10; //размер стороны квадрата
@@ -180,16 +181,66 @@ namespace WindowsFormsApplication1
                 {
                     if (!rightMouseButton)
                     {
+                        mapGraph.AddVertex($"{squareX}_{squareY}");
+
                         mapArray[squareY, squareX] = 0;
                         globalMapGraphics.FillRectangle(emptyRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
                         globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
                     }
                     else
                     {
+                        mapGraph.RemoveVertex($"{squareX}_{squareY}");
+
                         mapArray[squareY, squareX] = 1;
                         globalMapGraphics.FillRectangle(takenRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
                         globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
                     }
+
+                    if (squareX != 0 && mapArray[squareY, squareX] == 0)
+                    {
+                        if (!rightMouseButton)
+                        {
+                            mapGraph.AddEdge($"{squareX - 1}", $"{squareY}", 0);
+                        }
+                        else
+                        {
+                            mapGraph.RemoveEdge($"{squareX - 1}", $"{squareY}");
+                        }
+                    }
+                    if (squareX != x - 1 && mapArray[squareY, squareX] == 0)
+                    {
+                        if (!rightMouseButton)
+                        {
+                            mapGraph.AddEdge($"{squareX + 1}", $"{squareY}", 0);
+                        }
+                        else
+                        {
+                            mapGraph.RemoveEdge($"{squareX + 1}", $"{squareY}");
+                        }
+                    }
+                    if (squareY != 0 && mapArray[squareY, squareX] == 0)
+                    {
+                        if (!rightMouseButton)
+                        {
+                            mapGraph.AddEdge($"{squareX}", $"{squareY - 1}", 0);
+                        }
+                        else
+                        {
+                            mapGraph.RemoveEdge($"{squareX}", $"{squareY - 1}");
+                        }
+                    }
+                    if (squareY != y - 1 && mapArray[squareY, squareX] == 0)
+                    {
+                        if (!rightMouseButton)
+                        {
+                            mapGraph.AddEdge($"{squareX}", $"{squareY + 1}", 0);
+                        }
+                        else
+                        {
+                            mapGraph.RemoveEdge($"{squareX}", $"{squareY + 1}");
+                        }
+                    }
+
                     globalMapPictureBox.Image = globalMap;
                 }
 			}
