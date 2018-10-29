@@ -28,22 +28,49 @@ namespace WindowsFormsApplication1
 
         private void MapBuild() //дополнение карты окружением роботов
         {
+            int robotNum = 0;
             foreach (Robot robot in robots)
             {
                 (int x, int y) robotCoordinates = robot.GetCoordinates(true);
 
-                int[] robotSurroundings = robot.GetSurroundings();
-
-                int a = 0;
                 for (int i = robotCoordinates.y - 1; i <= robotCoordinates.y + 1; i++)
                 {
                     for (int j = robotCoordinates.x - 1; j <= robotCoordinates.x + 1; j++)
                     {
-                        map[i, j] = robotSurroundings[a++];
+                        robotMap[i, j] = fullMap[i,j];
                     }
                 }
 
-                (int x, int y) robotPrevCoordinates = robot.GetCoordinates(false);
+                List<(int x, int y)> freePathList = new List<(int x, int y)>();
+
+                if (robotMap[robotCoordinates.y, robotCoordinates.x - 1] == 0)
+                    freePathList.Add((robotCoordinates.x-1, robotCoordinates.y));
+                if (robotMap[robotCoordinates.y - 1, robotCoordinates.x] == 0)
+                    freePathList.Add((robotCoordinates.x, robotCoordinates.y-1));
+                if (robotMap[robotCoordinates.y, robotCoordinates.x + 1] == 0)
+                    freePathList.Add((robotCoordinates.x + 1, robotCoordinates.y));
+                if (robotMap[robotCoordinates.y + 1, robotCoordinates.x] == 0)
+                    freePathList.Add((robotCoordinates.x, robotCoordinates.y+1));
+
+                if (freePathList.Count == 1) // достиг конца коридора
+                {
+                    robot.status = true;
+                    free.Add(robotNum);
+                    busy.Remove(robotNum);
+                }
+
+                else
+                {
+                    robot.path.Add($"{freePathList[0].x}_{freePathList[0].y}");
+                    freePathList.RemoveAt(0);
+                    while (freePathList.Any())
+                    {
+                        tasks.Enqueue(freePathList[0]);
+                        freePathList.RemoveAt(0);
+                    }
+                }
+
+                robotNum++;
             }
         }
                 
