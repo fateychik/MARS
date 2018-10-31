@@ -10,16 +10,20 @@ namespace WindowsFormsApplication1
 
         public bool status; // 1-свободен 0-занят
         public (int x, int y) coordinates;
-        (int x, int y) prevCoordinates;
+        public (int x, int y) prevCoordinates;
         public List<string> path;
+        public Dictionary<string, int> tasks; // task / dist
 
-        public Robot()
+        public Robot((int x, int y) poit)
         {
             path = new List<string>();
-            coordinates.x = 0;
-            coordinates.y = 0;
-            prevCoordinates.x = prevCoordinates.y = 0;
+            coordinates.x = poit.x;
+            coordinates.y = poit.y;
+            prevCoordinates.x = poit.x;
+            prevCoordinates.y = poit.y;
             status = true;
+
+            tasks = new Dictionary<string, int>();
         }
 
 
@@ -31,5 +35,9 @@ namespace WindowsFormsApplication1
                 return prevCoordinates;
         }
 
+        public string MaxRatingTask
+        {
+            get { return tasks.First(s => s.Value == tasks.Values.Min()).Key; }
+        }
     }
 }

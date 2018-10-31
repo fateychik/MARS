@@ -118,6 +118,9 @@ namespace WindowsFormsApplication1
 
 		void SaveButtonClick(object sender, EventArgs e)
 		{
+            OpSystem OS = new OpSystem(3, mapArray, (0, 1));
+            OS.Start();
+            /*
             string fileName = System.IO.Path.Combine(@"c:\MARS maps", System.IO.Path.GetRandomFileName());
 
             using (StreamWriter map = new StreamWriter(fileName + ".txt", true, System.Text.Encoding.Default))
@@ -129,6 +132,7 @@ namespace WindowsFormsApplication1
                     map.WriteLine();
                 }
             }
+            */
         } //нажание на кнопку сохранения
 
 		void CreateButtonClick(object sender, EventArgs e)
@@ -161,7 +165,7 @@ namespace WindowsFormsApplication1
 				{
                     globalMapGraphics.FillRectangle(takenRectBrush, j * (sideSize), i * (sideSize), sideSize + 1, sideSize + 1);
                     globalMapGraphics.DrawRectangle(emptyRectPen, j * (sideSize), i * (sideSize), sideSize, sideSize);
-                    mapArray[i, j] = 1;
+                    mapArray[i, j] = 0;
 				}
 			}
 
@@ -180,13 +184,13 @@ namespace WindowsFormsApplication1
                 {
                     if (!rightMouseButton)
                     {
-                        mapArray[squareY, squareX] = 0;
+                        mapArray[squareY, squareX] = 1;
                         globalMapGraphics.FillRectangle(emptyRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
                         globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
                     }
                     else
                     {
-                        mapArray[squareY, squareX] = 1;
+                        mapArray[squareY, squareX] = 0;
                         globalMapGraphics.FillRectangle(takenRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
                         globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
                     }
