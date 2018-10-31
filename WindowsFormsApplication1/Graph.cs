@@ -153,7 +153,7 @@ namespace WindowsFormsApplication1
             return vertexList;
         }
 
-        public List<string> WideWidthSearch(string start, string goal, out float distance)
+        public List<string> WideWidthSearch(string start, string goal, out int distance)
         {
             Dictionary<string, string> ways = new Dictionary<string, string>();
             List<string> visitedVertex = new List<string>();
@@ -183,15 +183,16 @@ namespace WindowsFormsApplication1
             seach.Clear();
 
             temp = new List<string>();
-            temp.Add(ways[goal]);
+            temp.Add(goal);//temp.Add(ways[goal]);
             int j = 0;
 
             while (!temp.Contains(start))
             {
                 temp.Add(ways[temp[j]]);
                 j++;
-                distance += adjMatrix[j][j - 1];
+                distance += 1;//adjMatrix[j][j - 1];
             }
+            temp.Remove(start);
             temp.Reverse();
 
             return temp;
