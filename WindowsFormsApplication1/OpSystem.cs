@@ -7,7 +7,7 @@ namespace WindowsFormsApplication1
 {
     class OpSystem
     {
-        Stack<(int x, int y)> tasks; // те задача обозначается через координаты цели
+        List<(int x, int y)> tasks; // те задача обозначается через координаты цели
         Robot[] robots;
         int[,] fullMap;              // массив, содержащий полную карту пользователя(для локации роботов)
         int[,] robotMap;             // массив, содержащий карту от роботов
@@ -25,39 +25,36 @@ namespace WindowsFormsApplication1
 
             this.fullMap = fullMap;
             robotMap = new int[fullMap.GetLength(0), fullMap.GetLength(1)];
-            tasks = new Stack<(int x, int y)>();
+            tasks = new List<(int x, int y)>();
             graph = new Graph();
             graph.AddVertex($"{point.x}_{point.y}");
             free = new List<int>();
-            for (int i = 1; i < robotsNumber; i++) // объяевение всех роботов, как свободных
+            for (int i = 1; i < robotsNumber; i++)  // объяевение всех роботов, как свободных
                 free.Add(i);
 
             busy = new List<int>();
-            busy.Add(0); // для того, чтобы начать первый цикл работы
+            busy.Add(0);                            // для того, чтобы начать первый цикл работы
 
             sorted = new Dictionary<int, string>(); // hz
         }
 
         public void Start()
         {
-            // нужно поместить роботов в начальную точку и сделать ее первой вершиной графа
-
             while (true)
             {
                 TerritoryInvestigation();
                 GiveTask();
                 CoordIncrement();
             }
-
         }
 
-        private void TerritoryInvestigation() //дополнение карты окружением роботов
+        private void TerritoryInvestigation()                                                 //дополнение карты окружением роботов
         {
             var buf = new List<int>();
 
             foreach (int num in busy)
             {
-                if (robots[num].path.Any()) continue; // опрашиваем только граничных роботов
+                if (robots[num].path.Any()) continue;                                         // опрашиваем только граничных роботов
 
                 (int x, int y) coordinates = robots[num].GetCoordinates(true);
 
@@ -71,10 +68,10 @@ namespace WindowsFormsApplication1
                         
                         if ((i, j) != robots[num].GetCoordinates(false) && fullMap[i, j] != 0)
                         {
-                            robotMap[i, j] = fullMap[i, j]; // отрисовываем карту
-                            graph.AddVertex($"{i}_{j}"); // добавление вершины в граф лабиринта
+                            robotMap[i, j] = fullMap[i, j];                                   // отрисовываем карту
+                            graph.AddVertex($"{i}_{j}");                                      // добавление вершины в граф лабиринта
                             graph.AddEdge($"{i}_{j}", $"{coordinates.x}_{coordinates.y}", 1); // добавение ребра
-                            tasks.Push((i, j)); // добавление задачи
+                            tasks.Add((i, j));                                                // добавление задачи
                         }
                     }
                 }
@@ -90,87 +87,69 @@ namespace WindowsFormsApplication1
                 
         private void GiveTask()
         {
-            List<string> path = new List<string>();
-           
-            while (tasks.Any() && free.Any())
-            {
-                var task = tasks.Pop();
-                var goal = $"{task.x}_{task.y}";
-                int robot = int.MaxValue;
-                int bufDistance = int.MaxValue;
-
-                foreach (int i in free) 
-                {
-                    var start = $"{robots[i].coordinates.x}_{robots[i].coordinates.y}";
-                    
-                    path = graph.WideWidthSearch(start, goal, out int distance);
-                    robot = distance < bufDistance ? i : robot;
-                    //if (distance == 1) break; // if dist = 1 -> end // те назначать задачу ближайшему
-                }
-
-                robots[robot].path = path;
-                free.Remove(robot);
-                busy.Add(robot);
-                robots[robot].status = false;
-            }
-            
-  
-            /*
             foreach ((int x, int y) j in tasks)
             {
-                //var task = tasks.Dequeue();
                 var goal = $"{j.x}_{j.y}";
 
                 foreach (int i in free)
-                {
+                { 
                     var start = $"{robots[i].coordinates.x}_{robots[i].coordinates.y}";
                     graph.WideWidthSearch(start, goal, out int distance);
-                    robots[i].tasks.Add(goal, distance);
+                    robots[i].ratingTasks.Add(goal, distance);
                 }
             }
-
-            foreach (int i in free)
+            if (tasks.Any())
             {
-                Sort(i, robots[i].MaxRatingTask);
-            }
+                foreach (int i in free)
+                {
+                    Sort(i, robots[i].MaxRatingTask);
+                }
 
-            foreach (var i in sorted.Keys)
-            {
-                var start = $"{robots[i].coordinates.x}_{robots[i].coordinates.y}";
-                robots[i].path = graph.WideWidthSearch(start, sorted[i], out int distance);
+                foreach (int i in free)
+                {
+                    robots[i].ratingTasks.Clear();
+                }
 
-                var o = sorted[i].Split('_');
-                tasks.Remove((int.Parse(o[0]), int.Parse(o[1])));
-                robots[i].status = false;
-                free.Remove(i);
-                busy.Add(i);
+                foreach (var i in sorted.Keys)
+                {
+                    var start = $"{robots[i].coordinates.x}_{robots[i].coordinates.y}";
+                    robots[i].path = graph.WideWidthSearch(start, sorted[i], out int distance);
+
+                    var o = sorted[i].Split('_');
+                    tasks.Remove((int.Parse(o[0]), int.Parse(o[1])));
+                    robots[i].status = false;
+                    free.Remove(i);
+                    busy.Add(i);
+                }
             }
-            */
+            sorted.Clear();
+
         }
 
         private void Sort(int i, string task)
         {
-            if (!sorted.ContainsValue(task))
+            if (!sorted.ContainsValue(task) && !sorted.ContainsKey(i))
             {
                 sorted.Add(i, task);
             }
             else
             {
                 var temp = FindRobot(task);
-                if (robots[i].tasks[task] > robots[temp].tasks[task])
+                if (robots[i].ratingTasks[task] >= robots[temp].ratingTasks[task])
                 {
-                    robots[i].tasks.Remove(task);
-                    if (robots[i].tasks.Any())
+                    robots[i].ratingTasks[task] = int.MaxValue;
+
+                    if (robots[i].ratingTasks[robots[i].MaxRatingTask] != int.MaxValue)
                         Sort(i, robots[i].MaxRatingTask);
-                    else return;
                 }
                 else
                 {
                     sorted[i] = task;
-                    robots[temp].tasks.Remove(task);
-                    if (robots[temp].tasks.Any())
+                    sorted.Remove(temp);
+                    robots[temp].ratingTasks[task] = int.MaxValue;
+
+                    if (robots[temp].ratingTasks[robots[i].MaxRatingTask] != int.MaxValue)
                         Sort(temp, robots[temp].MaxRatingTask);
-                    else return;
                 }
             }
         }
