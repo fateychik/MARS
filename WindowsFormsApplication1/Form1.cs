@@ -190,7 +190,10 @@ namespace WindowsFormsApplication1
 
         void SaveButtonClick(object sender, EventArgs e)
 		{
-            string fileName = System.IO.Path.Combine(@"c:\MARS maps", System.IO.Path.GetRandomFileName());
+            OpSystem OS = new OpSystem(3, mapArray, (0, 1));
+            OS.Start();
+            
+            /*string fileName = System.IO.Path.Combine(@"c:\MARS maps", System.IO.Path.GetRandomFileName());
 
             using (StreamWriter map = new StreamWriter(fileName + ".txt", true, System.Text.Encoding.Default))
             {
@@ -200,7 +203,8 @@ namespace WindowsFormsApplication1
                         map.Write(mapArray[i, j] + " ");
                     map.WriteLine();
                 }
-            }
+            }*/
+            
         } //нажание на кнопку сохранения
 
 		void CreateButtonClick(object sender, EventArgs e)
@@ -210,12 +214,11 @@ namespace WindowsFormsApplication1
             CreateMap ();
 		} //нажатие на кнопку создания карты
 
-		// начало отрисовки интерфейса и карты
 		void CreateMap()
 		{
 
 
-			this.Size = new Size(x * sideSize + 300, y * sideSize + 150); //окно программы
+			this.Size = new Size(x * sideSize + 1000, y * sideSize + 150); //окно программы
 
 
 			globalMapPictureBox.Size = new Size(x * sideSize+1, y * sideSize+1); //окно карты
@@ -223,13 +226,14 @@ namespace WindowsFormsApplication1
 
 			globalMap = new Bitmap(x * sideSize+1, y * sideSize+1);
 
+//<<<<<<< HEAD
             robotMap = new Bitmap(x * sideSize + 1, y * sideSize + 1);
 
             globalMapGraphics = Graphics.FromImage(globalMap);
 
             robotMapGraphics = Graphics.FromImage(robotMap);
 
-            for (int i = 0; i < y; i++)
+            for (int i = 0; i < y; i++) //заполнение массивов карты
             {
                 for (int j = 0; j < x; j++)
                 {
@@ -237,11 +241,21 @@ namespace WindowsFormsApplication1
                     robotMapArray[i, j] = 2;
                 }
             }
+//=======
+			/*for (int i = 0; i < y; i++) //отрисовка пустых карты
+			{
+				for (int j = 0; j < x; j++)
+				{
+                    globalMapGraphics.FillRectangle(takenRectBrush, j * (sideSize), i * (sideSize), sideSize + 1, sideSize + 1);
+                    globalMapGraphics.DrawRectangle(emptyRectPen, j * (sideSize), i * (sideSize), sideSize, sideSize);
+                    mapArray[i, j] = 0;
+				}
+			}*/
+//>>>>>>> master
 
             DrawMap();
 
-		} //отрисовка карты
-          //конец отрисовки интерфейса и карты
+		}
 
         void DrawMap()
         {
@@ -278,17 +292,25 @@ namespace WindowsFormsApplication1
                 {
                     if (!rightMouseButton)
                     {
+//<<<<<<< HEAD
                         mapGraph.AddVertex($"{squareX}_{squareY}");
 
                         mapArray[squareY, squareX] = 0;
+//=======
+                        //mapArray[squareY, squareX] = 1;
+//>>>>>>> master
                         globalMapGraphics.FillRectangle(emptyRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
                         globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
                     }
                     else
                     {
+//<<<<<<< HEAD
                         mapGraph.RemoveVertex($"{squareX}_{squareY}");
 
                         mapArray[squareY, squareX] = 1;
+//=======
+                        //mapArray[squareY, squareX] = 0;
+//>>>>>>> master
                         globalMapGraphics.FillRectangle(takenRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
                         globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
                     }

@@ -8,18 +8,22 @@ namespace WindowsFormsApplication1
     class Robot
     {
 
-        public bool status; // 1-свободен 0-занят
+        public bool status;                         // 1-свободен 0-занят
         public (int x, int y) coordinates;
-        (int x, int y) prevCoordinates;
+        public (int x, int y) prevCoordinates;
         public List<string> path;
+        public Dictionary<string, int> ratingTasks; // task / dist
 
-        public Robot()
+        public Robot((int x, int y) poit)
         {
             path = new List<string>();
-            coordinates.x = 0;
-            coordinates.y = 0;
-            prevCoordinates.x = prevCoordinates.y = 0;
+            coordinates.x = poit.x;
+            coordinates.y = poit.y;
+            prevCoordinates.x = poit.x;
+            prevCoordinates.y = poit.y;
             status = true;
+
+            ratingTasks = new Dictionary<string, int>();
         }
 
 
@@ -31,5 +35,9 @@ namespace WindowsFormsApplication1
                 return prevCoordinates;
         }
 
+        public string MaxRatingTask
+        {
+            get { return ratingTasks.First(s => s.Value == ratingTasks.Values.Min()).Key; }
+        }
     }
 }

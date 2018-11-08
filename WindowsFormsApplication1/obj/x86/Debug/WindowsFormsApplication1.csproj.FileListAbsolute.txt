@@ -86,3 +86,15 @@ E:\Project\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
 \\VBOXSVR\files\Project\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.csproj.CopyComplete
 \\VBOXSVR\files\Project\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
 \\VBOXSVR\files\Project\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
+C:\projects\MARS\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe
+C:\projects\MARS\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.pdb
+C:\projects\MARS\WindowsFormsApplication1\bin\Debug\System.ValueTuple.dll
+C:\projects\MARS\WindowsFormsApplication1\bin\Debug\System.ValueTuple.xml
+C:\projects\MARS\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.csprojAssemblyReference.cache
+C:\projects\MARS\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Form1.resources
+C:\projects\MARS\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.Properties.Resources.resources
+C:\projects\MARS\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.csproj.GenerateResource.cache
+C:\projects\MARS\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.csproj.CoreCompileInputs.cache
+C:\projects\MARS\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.csproj.CopyComplete
+C:\projects\MARS\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.exe
+C:\projects\MARS\WindowsFormsApplication1\obj\x86\Debug\WindowsFormsApplication1.pdb
