@@ -38,14 +38,15 @@ namespace WindowsFormsApplication1
             sorted = new Dictionary<int, string>(); // hz
         }
 
-        public void Start()
+        public int[,] Start()
         {
-            while (true)
-            {
+            //while (true)
+            //{
                 TerritoryInvestigation();
                 GiveTask();
                 CoordIncrement();
-            }
+            return robotMap;
+            //}
         }
 
         private void TerritoryInvestigation()                                                 //дополнение карты окружением роботов
@@ -65,7 +66,7 @@ namespace WindowsFormsApplication1
                         if ((n + m) % 2 == 0) continue;
                         int i = coordinates.x + n <= 0 ? 0 : coordinates.x + n;
                         int j = coordinates.y + m <= 0 ? 0 : coordinates.y + m;
-                        
+
                         if ((i, j) != robots[num].GetCoordinates(false) && fullMap[i, j] != 0)
                         {
                             robotMap[i, j] = fullMap[i, j];                                   // отрисовываем карту

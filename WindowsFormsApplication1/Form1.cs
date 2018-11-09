@@ -21,19 +21,21 @@ namespace WindowsFormsApplication1
             InterfaceDraw();
         }
 
-		int x, y; //значения размерности
+        OpSystem OS;
+
+        int x, y; //значения размерности
 		bool draw = false;
         bool rightMouseButton = false;
 		int[,] mapArray;
         int[,] robotMapArray;
-        bool currentMap = false; //0 - global, 1 - robot
-        Graph mapGraph = new Graph();
+        //bool currentMap = true; //0 - global, 1 - robot
+        //Graph mapGraph = new Graph();
 
-		//отрисовка элементов карты
 		int sideSize = 10; //размер стороны квадрата
 		static int lineWidth = 1; //ширина линии квадрата
 
 		PictureBox globalMapPictureBox = new PictureBox();
+        PictureBox robotMapPictureBox = new PictureBox();
 		Bitmap globalMap;
 		Graphics globalMapGraphics;
         Bitmap robotMap;
@@ -42,46 +44,58 @@ namespace WindowsFormsApplication1
 		Button saveButton = new Button ();
 		Button loadButton = new Button ();
 		Button createButton = new Button ();
-        Button switchMapButton = new Button();
-		Label xTrackBarLabel = new Label ();
+        //Button switchMapButton = new Button();
+        Button savedMapsButton = new Button();
+        Button startButton = new Button();
+        Label xTrackBarLabel = new Label ();
 		Label yTrackBarLabel = new Label ();
 		TrackBar xTrackBar = new TrackBar ();
 		TrackBar yTrackBar = new TrackBar ();
 
         CheckedListBox savedMaps = new CheckedListBox();
-        Button savedMapsButton = new Button();
 
         Size buttonSize = new Size (100, 25);
+        int buttonShift = 115;
+        int buttonLocationY = 10;
 
-		Pen emptyRectPen = new Pen(Color.Gray, lineWidth); //линия пустой клетки
+        Pen emptyRectPen = new Pen(Color.Gray, lineWidth); //линия пустой клетки
 		SolidBrush takenRectBrush = new SolidBrush(Color.Black); //зарисовка занятой клетки
         SolidBrush emptyRectBrush = new SolidBrush(Color.LightGray);
         SolidBrush unknownRectBrush = new SolidBrush(Color.LightBlue);
-        //
 
         void InitializeComponents()
         {
-            this.Size = new Size(500, 350); //окно программы
+            this.Size = new Size(buttonShift * 5, 350); //окно программы
 
-            loadButton.Location = new Point(10, 10);
+            loadButton.Location = new Point(10, buttonLocationY);
             loadButton.Size = buttonSize;
             loadButton.Text = "Загрузить";
             loadButton.MouseClick += new MouseEventHandler(LoadButtonClick);
 
-            saveButton.Location = new Point(125, 10);
+            saveButton.Location = new Point(10 + buttonShift, buttonLocationY);
             saveButton.Size = buttonSize;
             saveButton.Text = "Сохранить";
             saveButton.MouseClick += new MouseEventHandler(SaveButtonClick);
 
-            createButton.Location = new Point(240, 10);
+            createButton.Location = new Point(10 + buttonShift * 2, buttonLocationY);
             createButton.Size = buttonSize;
             createButton.Text = "Создать";
             createButton.MouseClick += new MouseEventHandler(CreateButtonClick);
 
-            switchMapButton.Location = new Point(355, 10);
+            /*switchMapButton.Location = new Point(10 + buttonShift * 3, buttonLocationY);
             switchMapButton.Size = buttonSize;
             switchMapButton.Text = "Карта";
-            switchMapButton.MouseClick += new MouseEventHandler(SwitchMap);
+            switchMapButton.MouseClick += new MouseEventHandler(SwitchMap);*/
+
+            startButton.Location = new Point(10 + buttonShift * 3, buttonLocationY);
+            startButton.Size = buttonSize;
+            startButton.Text = "Начать";
+            startButton.MouseClick += new MouseEventHandler(StartButtonClick);
+
+            savedMapsButton.Location = new Point(230, 100);
+            savedMapsButton.Size = buttonSize;
+            savedMapsButton.Text = "Загрузить";
+            savedMapsButton.MouseClick += new MouseEventHandler(SavedMapChoiceButtonClick);
 
             xTrackBarLabel.Location = new Point(10, 50);
             xTrackBarLabel.Size = new Size(40, 20);
@@ -106,22 +120,12 @@ namespace WindowsFormsApplication1
             savedMaps.Location = new Point(10, 100);
             savedMaps.Size = new Size(200, 200);
 
-            savedMapsButton.Location = new Point(230, 100);
-            savedMapsButton.Size = buttonSize;
-            savedMapsButton.Text = "Загрузить";
-            savedMapsButton.MouseClick += new MouseEventHandler(SavedMapChoiceButtonClick);
-
             globalMapPictureBox.MouseMove += new MouseEventHandler(GlobalMapMouseMove);
             globalMapPictureBox.MouseUp += new MouseEventHandler(GlobalMapMouseUp);
             globalMapPictureBox.MouseDown += new MouseEventHandler(GlobalMapMouseDown);
+            globalMapPictureBox.Location = new Point(10, 100);
 
             emptyRectPen.Alignment = PenAlignment.Inset; //закрашивание внутри контура
-
-            globalMapPictureBox.Location = new Point(10, 100); //размещение карты в окне
-
-            Controls.Add(globalMapPictureBox);
-
-
         }
 
         void InterfaceDraw()
@@ -133,14 +137,16 @@ namespace WindowsFormsApplication1
             Controls.Add(xTrackBar);
             Controls.Add(yTrackBarLabel);
             Controls.Add(yTrackBar);
-            Controls.Add(switchMapButton);
-        }
+            //Controls.Add(switchMapButton);
+            Controls.Add(startButton);
+            Controls.Add(globalMapPictureBox);
+        } //отрисовка элементов интерфейса
 
-        void SwitchMap(object sender, EventArgs e)
+        /*void SwitchMap(object sender, EventArgs e)
         {
             globalMapPictureBox.Image = currentMap ? globalMap : robotMap;
             currentMap = !currentMap;
-        }
+        }*/
 
         void TrackBarScroll(object sender, EventArgs e)
 		{
@@ -165,7 +171,7 @@ namespace WindowsFormsApplication1
 
         void SavedMapChoiceButtonClick(object sender, EventArgs e) //нажатие на кнопку выбора сохранённой карты
         {
-            var file = File.ReadAllLines((string)savedMaps.SelectedItem); // хз как путь выбирать(мб создать меню с имеющимися файлами)
+            var file = File.ReadAllLines((string)savedMaps.SelectedItem);
             mapArray = new int[file.Length, file[0].Length / 2];
             robotMapArray = new int[file.Length, file[0].Length / 2];
 
@@ -190,10 +196,8 @@ namespace WindowsFormsApplication1
 
         void SaveButtonClick(object sender, EventArgs e)
 		{
-            OpSystem OS = new OpSystem(3, mapArray, (0, 1));
-            OS.Start();
             
-            /*string fileName = System.IO.Path.Combine(@"c:\MARS maps", System.IO.Path.GetRandomFileName());
+            string fileName = System.IO.Path.Combine(@"c:\MARS maps", System.IO.Path.GetRandomFileName());
 
             using (StreamWriter map = new StreamWriter(fileName + ".txt", true, System.Text.Encoding.Default))
             {
@@ -203,59 +207,55 @@ namespace WindowsFormsApplication1
                         map.Write(mapArray[i, j] + " ");
                     map.WriteLine();
                 }
-            }*/
+            }
             
         } //нажание на кнопку сохранения
+
+        void StartButtonClick(object sender, EventArgs e)
+        {
+            OS = new OpSystem(3, mapArray, (0, 1));
+            robotMapArray = OS.Start();
+            DrawMap();
+            startButton.Text = "Шаг";
+            startButton.MouseClick -= new MouseEventHandler(SaveButtonClick);
+            startButton.MouseClick += new MouseEventHandler(StepButtonClick);
+        }
+
+        void StepButtonClick(object sender, EventArgs e)
+        {
+            robotMapArray = OS.Start();
+            DrawMap();
+        }
 
 		void CreateButtonClick(object sender, EventArgs e)
 		{
 			mapArray = new int[y, x];
             robotMapArray = new int[y, x];
-            CreateMap ();
-		} //нажатие на кнопку создания карты
+            CreateMap();
+        } //нажатие на кнопку создания карты
 
-		void CreateMap()
-		{
-
-
-			this.Size = new Size(x * sideSize + 1000, y * sideSize + 150); //окно программы
-
-
-			globalMapPictureBox.Size = new Size(x * sideSize+1, y * sideSize+1); //окно карты
-
-
-			globalMap = new Bitmap(x * sideSize+1, y * sideSize+1);
-
-//<<<<<<< HEAD
+        void CreateMap()
+        {
+            this.Size = new Size(x * sideSize * 2 + 100 < buttonShift * 5 ? buttonShift * 5 : x * sideSize * 2 + 100, y * sideSize + 150);
+            globalMapPictureBox.Size = new Size(x * sideSize + 1, y * sideSize + 1);
+            globalMap = new Bitmap(x * sideSize + 1, y * sideSize + 1);
+            robotMapPictureBox.Size = new Size(x * sideSize + 1, y * sideSize + 1);
+            robotMapPictureBox.Location = new Point(globalMapPictureBox.Location.X + x * sideSize + sideSize, globalMapPictureBox.Location.Y);
             robotMap = new Bitmap(x * sideSize + 1, y * sideSize + 1);
-
+            Controls.Add(robotMapPictureBox);
             globalMapGraphics = Graphics.FromImage(globalMap);
-
             robotMapGraphics = Graphics.FromImage(robotMap);
 
             for (int i = 0; i < y; i++) //заполнение массивов карты
             {
                 for (int j = 0; j < x; j++)
                 {
-                    mapArray[i, j] = 1;
+                    mapArray[i, j] = 0;
                     robotMapArray[i, j] = 2;
                 }
             }
-//=======
-			/*for (int i = 0; i < y; i++) //отрисовка пустых карты
-			{
-				for (int j = 0; j < x; j++)
-				{
-                    globalMapGraphics.FillRectangle(takenRectBrush, j * (sideSize), i * (sideSize), sideSize + 1, sideSize + 1);
-                    globalMapGraphics.DrawRectangle(emptyRectPen, j * (sideSize), i * (sideSize), sideSize, sideSize);
-                    mapArray[i, j] = 0;
-				}
-			}*/
-//>>>>>>> master
-
             DrawMap();
-
-		}
+        }
 
         void DrawMap()
         {
@@ -263,15 +263,15 @@ namespace WindowsFormsApplication1
             {
                 for (int j = 0; j < x; j++)
                 {
-                    if (mapArray[i, j] == 1)
+                    if (mapArray[i, j] == 0)
                         globalMapGraphics.FillRectangle(takenRectBrush, j * (sideSize), i * (sideSize), sideSize + 1, sideSize + 1);
                     else
                         globalMapGraphics.FillRectangle(emptyRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
                     globalMapGraphics.DrawRectangle(emptyRectPen, j * (sideSize), i * (sideSize), sideSize, sideSize);
 
-                    if (robotMapArray[i, j] == 1)
-                        robotMapGraphics.FillRectangle(takenRectBrush, j * (sideSize), i * (sideSize), sideSize + 1, sideSize + 1);
                     if (robotMapArray[i, j] == 0)
+                        robotMapGraphics.FillRectangle(takenRectBrush, j * (sideSize), i * (sideSize), sideSize + 1, sideSize + 1);
+                    if (robotMapArray[i, j] == 1)
                         robotMapGraphics.FillRectangle(emptyRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
                     if (robotMapArray[i, j] == 2)
                         robotMapGraphics.FillRectangle(unknownRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
@@ -280,9 +280,10 @@ namespace WindowsFormsApplication1
             }
 
             globalMapPictureBox.Image = globalMap;
+            robotMapPictureBox.Image = robotMap;
         }
 
-		private void GlobalMapMouseMove(object sender, MouseEventArgs e)
+        private void GlobalMapMouseMove(object sender, MouseEventArgs e)
 		{
 			if (draw)
 			{
@@ -292,72 +293,15 @@ namespace WindowsFormsApplication1
                 {
                     if (!rightMouseButton)
                     {
-//<<<<<<< HEAD
-                        mapGraph.AddVertex($"{squareX}_{squareY}");
-
-                        mapArray[squareY, squareX] = 0;
-//=======
-                        //mapArray[squareY, squareX] = 1;
-//>>>>>>> master
+                        mapArray[squareY, squareX] = 1;
                         globalMapGraphics.FillRectangle(emptyRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
                         globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
                     }
                     else
                     {
-//<<<<<<< HEAD
-                        mapGraph.RemoveVertex($"{squareX}_{squareY}");
-
-                        mapArray[squareY, squareX] = 1;
-//=======
-                        //mapArray[squareY, squareX] = 0;
-//>>>>>>> master
+                        mapArray[squareY, squareX] = 0;
                         globalMapGraphics.FillRectangle(takenRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
                         globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
-                    }
-
-                    if (squareX != 0 && mapArray[squareY, squareX] == 0)
-                    {
-                        if (!rightMouseButton)
-                        {
-                            mapGraph.AddEdge($"{squareX - 1}", $"{squareY}", 0);
-                        }
-                        else
-                        {
-                            mapGraph.RemoveEdge($"{squareX - 1}", $"{squareY}");
-                        }
-                    }
-                    if (squareX != x - 1 && mapArray[squareY, squareX] == 0)
-                    {
-                        if (!rightMouseButton)
-                        {
-                            mapGraph.AddEdge($"{squareX + 1}", $"{squareY}", 0);
-                        }
-                        else
-                        {
-                            mapGraph.RemoveEdge($"{squareX + 1}", $"{squareY}");
-                        }
-                    }
-                    if (squareY != 0 && mapArray[squareY, squareX] == 0)
-                    {
-                        if (!rightMouseButton)
-                        {
-                            mapGraph.AddEdge($"{squareX}", $"{squareY - 1}", 0);
-                        }
-                        else
-                        {
-                            mapGraph.RemoveEdge($"{squareX}", $"{squareY - 1}");
-                        }
-                    }
-                    if (squareY != y - 1 && mapArray[squareY, squareX] == 0)
-                    {
-                        if (!rightMouseButton)
-                        {
-                            mapGraph.AddEdge($"{squareX}", $"{squareY + 1}", 0);
-                        }
-                        else
-                        {
-                            mapGraph.RemoveEdge($"{squareX}", $"{squareY + 1}");
-                        }
                     }
 
                     globalMapPictureBox.Image = globalMap;
