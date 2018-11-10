@@ -38,14 +38,14 @@ namespace WindowsFormsApplication1
             sorted = new Dictionary<int, string>(); // hz
         }
 
-        public int[,] Start()
+        public Robot[] Start()
         {
             //while (true)
             //{
                 TerritoryInvestigation();
                 GiveTask();
                 CoordIncrement();
-            return robotMap;
+            return robots;
             //}
         }
 

@@ -22,6 +22,7 @@ namespace WindowsFormsApplication1
         }
 
         OpSystem OS;
+        Robot[] robots;
 
         int x, y; //значения размерности
 		bool draw = false;
@@ -62,6 +63,7 @@ namespace WindowsFormsApplication1
 		SolidBrush takenRectBrush = new SolidBrush(Color.Black); //зарисовка занятой клетки
         SolidBrush emptyRectBrush = new SolidBrush(Color.LightGray);
         SolidBrush unknownRectBrush = new SolidBrush(Color.LightBlue);
+        SolidBrush robotRectBrush = new SolidBrush(Color.Red);
 
         void InitializeComponents()
         {
@@ -214,7 +216,8 @@ namespace WindowsFormsApplication1
         void StartButtonClick(object sender, EventArgs e)
         {
             OS = new OpSystem(3, mapArray, (0, 1));
-            robotMapArray = OS.Start();
+            robots = OS.Start();
+            RobotMapArrayUpdate();
             DrawMap();
             startButton.Text = "Шаг";
             startButton.MouseClick -= new MouseEventHandler(SaveButtonClick);
@@ -223,7 +226,8 @@ namespace WindowsFormsApplication1
 
         void StepButtonClick(object sender, EventArgs e)
         {
-            robotMapArray = OS.Start();
+            robots = OS.Start();
+            RobotMapArrayUpdate();
             DrawMap();
         }
 
@@ -257,6 +261,33 @@ namespace WindowsFormsApplication1
             DrawMap();
         }
 
+        void RobotMapArrayUpdate()
+        {
+
+            for (int l = 0; l < robots.Count(); l++)
+            {
+                robotMapArray[robots[l].GetCoordinates(false).xCoord, robots[l].GetCoordinates(false).yCoord] = 1;
+            }
+
+            for (int l = 0; l < robots.Count(); l++)
+            {
+                for (int n = -1; n < 2; n++)
+                {
+                    for (int m = -1; m < 2; m++)
+                    {
+                        int i = robots[l].GetCoordinates(true).xCoord + n;
+                        int j = robots[l].GetCoordinates(true).yCoord + m;
+                        if (i < 0 || i == x || j < 0 || j == y)
+                            continue;
+                        if (n== 0 && m == 0)
+                            robotMapArray[i, j] = 3;
+                        else
+                            robotMapArray[i, j] = mapArray[i, j];
+                    }
+                }
+            }
+        }
+
         void DrawMap()
         {
             for (int i = 0; i < y; i++)
@@ -275,7 +306,12 @@ namespace WindowsFormsApplication1
                         robotMapGraphics.FillRectangle(emptyRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
                     if (robotMapArray[i, j] == 2)
                         robotMapGraphics.FillRectangle(unknownRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
+                    if (robotMapArray[i, j] == 3)
+                        robotMapGraphics.FillRectangle(robotRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
+
                     robotMapGraphics.DrawRectangle(emptyRectPen, j * (sideSize), i * (sideSize), sideSize, sideSize);
+                    
+
                 }
             }
 
