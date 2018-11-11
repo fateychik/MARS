@@ -63,10 +63,13 @@ namespace WindowsFormsApplication1
                     for (int m = - 1; m < 2; m++)
                     {
                         if ((n + m) % 2 == 0) continue;
+                        if (coordinates.x + n < 0 || coordinates.y + m < 0) continue;
+                        if (coordinates.x + n >= fullMap.GetLength(0) || coordinates.y + m >= fullMap.GetLength(1)) continue;
+
                         int i = coordinates.x + n <= 0 ? 0 : coordinates.x + n;
                         int j = coordinates.y + m <= 0 ? 0 : coordinates.y + m;
                         
-                        if ((i, j) != robots[num].GetCoordinates(false) && fullMap[i, j] != 0)
+                        if ((i, j) != robots[num].GetCoordinates(false) && fullMap[i, j] != 0 && robotMap[i, j] != 1)
                         {
                             robotMap[i, j] = fullMap[i, j];                                   // отрисовываем карту
                             graph.AddVertex($"{i}_{j}");                                      // добавление вершины в граф лабиринта

@@ -27,7 +27,6 @@ namespace WindowsFormsApplication1
 		int[,] mapArray;
         int[,] robotMapArray;
         bool currentMap = false; //0 - global, 1 - robot
-        Graph mapGraph = new Graph();
 
 		//отрисовка элементов карты
 		int sideSize = 10; //размер стороны квадрата
@@ -211,22 +210,17 @@ namespace WindowsFormsApplication1
 		{
 			mapArray = new int[y, x];
             robotMapArray = new int[y, x];
-            CreateMap ();
+            CreateMap();
 		} //нажатие на кнопку создания карты
 
 		void CreateMap()
 		{
-
-
 			this.Size = new Size(x * sideSize + 1000, y * sideSize + 150); //окно программы
-
 
 			globalMapPictureBox.Size = new Size(x * sideSize+1, y * sideSize+1); //окно карты
 
-
 			globalMap = new Bitmap(x * sideSize+1, y * sideSize+1);
 
-//<<<<<<< HEAD
             robotMap = new Bitmap(x * sideSize + 1, y * sideSize + 1);
 
             globalMapGraphics = Graphics.FromImage(globalMap);
@@ -237,22 +231,10 @@ namespace WindowsFormsApplication1
             {
                 for (int j = 0; j < x; j++)
                 {
-                    mapArray[i, j] = 1;
+                    mapArray[i, j] = 0;
                     robotMapArray[i, j] = 2;
                 }
             }
-//=======
-			/*for (int i = 0; i < y; i++) //отрисовка пустых карты
-			{
-				for (int j = 0; j < x; j++)
-				{
-                    globalMapGraphics.FillRectangle(takenRectBrush, j * (sideSize), i * (sideSize), sideSize + 1, sideSize + 1);
-                    globalMapGraphics.DrawRectangle(emptyRectPen, j * (sideSize), i * (sideSize), sideSize, sideSize);
-                    mapArray[i, j] = 0;
-				}
-			}*/
-//>>>>>>> master
-
             DrawMap();
 
 		}
@@ -263,7 +245,7 @@ namespace WindowsFormsApplication1
             {
                 for (int j = 0; j < x; j++)
                 {
-                    if (mapArray[i, j] == 1)
+                    if (mapArray[i, j] == 0)
                         globalMapGraphics.FillRectangle(takenRectBrush, j * (sideSize), i * (sideSize), sideSize + 1, sideSize + 1);
                     else
                         globalMapGraphics.FillRectangle(emptyRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
@@ -292,72 +274,17 @@ namespace WindowsFormsApplication1
                 {
                     if (!rightMouseButton)
                     {
-//<<<<<<< HEAD
-                        mapGraph.AddVertex($"{squareX}_{squareY}");
+                        mapArray[squareY, squareX] = 1;
 
-                        mapArray[squareY, squareX] = 0;
-//=======
-                        //mapArray[squareY, squareX] = 1;
-//>>>>>>> master
                         globalMapGraphics.FillRectangle(emptyRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
                         globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
                     }
                     else
                     {
-//<<<<<<< HEAD
-                        mapGraph.RemoveVertex($"{squareX}_{squareY}");
+                        mapArray[squareY, squareX] = 0;
 
-                        mapArray[squareY, squareX] = 1;
-//=======
-                        //mapArray[squareY, squareX] = 0;
-//>>>>>>> master
                         globalMapGraphics.FillRectangle(takenRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
                         globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
-                    }
-
-                    if (squareX != 0 && mapArray[squareY, squareX] == 0)
-                    {
-                        if (!rightMouseButton)
-                        {
-                            mapGraph.AddEdge($"{squareX - 1}", $"{squareY}", 0);
-                        }
-                        else
-                        {
-                            mapGraph.RemoveEdge($"{squareX - 1}", $"{squareY}");
-                        }
-                    }
-                    if (squareX != x - 1 && mapArray[squareY, squareX] == 0)
-                    {
-                        if (!rightMouseButton)
-                        {
-                            mapGraph.AddEdge($"{squareX + 1}", $"{squareY}", 0);
-                        }
-                        else
-                        {
-                            mapGraph.RemoveEdge($"{squareX + 1}", $"{squareY}");
-                        }
-                    }
-                    if (squareY != 0 && mapArray[squareY, squareX] == 0)
-                    {
-                        if (!rightMouseButton)
-                        {
-                            mapGraph.AddEdge($"{squareX}", $"{squareY - 1}", 0);
-                        }
-                        else
-                        {
-                            mapGraph.RemoveEdge($"{squareX}", $"{squareY - 1}");
-                        }
-                    }
-                    if (squareY != y - 1 && mapArray[squareY, squareX] == 0)
-                    {
-                        if (!rightMouseButton)
-                        {
-                            mapGraph.AddEdge($"{squareX}", $"{squareY + 1}", 0);
-                        }
-                        else
-                        {
-                            mapGraph.RemoveEdge($"{squareX}", $"{squareY + 1}");
-                        }
                     }
 
                     globalMapPictureBox.Image = globalMap;
