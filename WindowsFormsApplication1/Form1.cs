@@ -29,8 +29,12 @@ namespace WindowsFormsApplication1
         bool rightMouseButton = false;
 		int[,] mapArray;
         int[,] robotMapArray;
+//<<<<<<< HEAD
+        //bool currentMap = false; //0 - global, 1 - robot //смены карты больше нет
+//=======
         //bool currentMap = true; //0 - global, 1 - robot
         //Graph mapGraph = new Graph();
+//>>>>>>> origin/master
 
 		int sideSize = 10; //размер стороны квадрата
 		static int lineWidth = 1; //ширина линии квадрата
@@ -236,6 +240,18 @@ namespace WindowsFormsApplication1
 			mapArray = new int[y, x];
             robotMapArray = new int[y, x];
             CreateMap();
+/*<<<<<<< HEAD
+		} //нажатие на кнопку создания карты
+
+		void CreateMap()
+		{
+			this.Size = new Size(x * sideSize + 1000, y * sideSize + 150); //окно программы
+
+			globalMapPictureBox.Size = new Size(x * sideSize+1, y * sideSize+1); //окно карты
+
+			globalMap = new Bitmap(x * sideSize+1, y * sideSize+1);
+
+=======*/
         } //нажатие на кнопку создания карты
 
         void CreateMap()
@@ -245,6 +261,7 @@ namespace WindowsFormsApplication1
             globalMap = new Bitmap(x * sideSize + 1, y * sideSize + 1);
             robotMapPictureBox.Size = new Size(x * sideSize + 1, y * sideSize + 1);
             robotMapPictureBox.Location = new Point(globalMapPictureBox.Location.X + x * sideSize + sideSize, globalMapPictureBox.Location.Y);
+//>>>>>>> origin/master
             robotMap = new Bitmap(x * sideSize + 1, y * sideSize + 1);
             Controls.Add(robotMapPictureBox);
             globalMapGraphics = Graphics.FromImage(globalMap);
@@ -330,12 +347,20 @@ namespace WindowsFormsApplication1
                     if (!rightMouseButton)
                     {
                         mapArray[squareY, squareX] = 1;
+//<<<<<<< HEAD
+
+//=======
+//>>>>>>> origin/master
                         globalMapGraphics.FillRectangle(emptyRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
                         globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
                     }
                     else
                     {
                         mapArray[squareY, squareX] = 0;
+//<<<<<<< HEAD
+
+//=======
+//>>>>>>> origin/master
                         globalMapGraphics.FillRectangle(takenRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
                         globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
                     }
