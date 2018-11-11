@@ -31,6 +31,7 @@ namespace WindowsFormsApplication1
 		int[,] mapArray;
         int[,] robotMapArray;
         int robotNum = 1;
+        int[] robotNums;
 
 		int sideSize = 10; //размер стороны квадрата
 		static int lineWidth = 1; //ширина линии квадрата
@@ -53,6 +54,7 @@ namespace WindowsFormsApplication1
 		TrackBar xTrackBar = new TrackBar ();
 		TrackBar yTrackBar = new TrackBar ();
         TrackBar robotNumBar = new TrackBar ();
+        TextBox robotNumTextBox = new TextBox();
 
         CheckedListBox savedMaps = new CheckedListBox();
 
@@ -63,6 +65,7 @@ namespace WindowsFormsApplication1
         int labelShift = 160;
         int labelLocationY = 50;
         int barShift = 40;
+        Size textBoxSize = new Size(185, 40);
 
         Pen emptyRectPen = new Pen(Color.Gray, lineWidth); //линия пустой клетки
 		SolidBrush takenRectBrush = new SolidBrush(Color.Black); //зарисовка занятой клетки
@@ -129,6 +132,9 @@ namespace WindowsFormsApplication1
             robotNumBar.TickFrequency = 1;
             robotNumBar.Scroll += TrackBarScroll;
 
+            robotNumTextBox.Location = new Point(robotNumBarLabel.Location.X, robotNumBarLabel.Location.Y + robotNumBarLabel.Size.Height + 5);
+            robotNumTextBox.Size = textBoxSize;
+
             savedMaps.CheckOnClick = true;
             savedMaps.SelectionMode = SelectionMode.One;
             savedMaps.Location = new Point(10, 100);
@@ -137,7 +143,7 @@ namespace WindowsFormsApplication1
             globalMapPictureBox.MouseMove += new MouseEventHandler(GlobalMapMouseMove);
             globalMapPictureBox.MouseUp += new MouseEventHandler(GlobalMapMouseUp);
             globalMapPictureBox.MouseDown += new MouseEventHandler(GlobalMapMouseDown);
-            globalMapPictureBox.Location = new Point(10, 100);
+            globalMapPictureBox.Location = new Point(10, 130);
 
             emptyRectPen.Alignment = PenAlignment.Inset; //закрашивание внутри контура
         }
@@ -155,6 +161,7 @@ namespace WindowsFormsApplication1
             Controls.Add(robotNumBar);
             Controls.Add(startButton);
             Controls.Add(globalMapPictureBox);
+            Controls.Add(robotNumTextBox);
         } //отрисовка элементов интерфейса
 
         void TrackBarScroll(object sender, EventArgs e)
@@ -243,6 +250,7 @@ namespace WindowsFormsApplication1
             robots = OS.Start();
             RobotMapArrayUpdate();
             DrawMap();
+            //ConsoleDebugOutput();
         }
 
 		void CreateButtonClick(object sender, EventArgs e)
@@ -266,7 +274,7 @@ namespace WindowsFormsApplication1
 
         void CreateMap()
         {
-            this.Size = new Size(x * sideSize * 2 + 100 < buttonShift * 5 ? buttonShift * 5 : x * sideSize * 2 + 100, y * sideSize + 150);
+            this.Size = new Size(x * sideSize * 2 + 100 < buttonShift * 5 ? buttonShift * 5 : x * sideSize * 2 + 100, y * sideSize + 200);
             globalMapPictureBox.Size = new Size(x * sideSize + 1, y * sideSize + 1);
             globalMap = new Bitmap(x * sideSize + 1, y * sideSize + 1);
             robotMapPictureBox.Size = new Size(x * sideSize + 1, y * sideSize + 1);
@@ -313,31 +321,7 @@ namespace WindowsFormsApplication1
                 }
             }
 
-        }
-
-        void ConsoleOutput()
-        {
-            Console.WriteLine("Global map\n");
-
-            for (int i = 0; i < y; i++)
-            {
-                for (int j = 0; j < x; j++)
-                {
-                    Console.Write(mapArray[i, j]);
-                }
-                Console.WriteLine();
-            }
-            Console.WriteLine("Robot map\n");
-            for (int i = 0; i < y; i++)
-            {
-                for (int j = 0; j < x; j++)
-                {
-                    Console.Write(robotMapArray[i, j]);
-                }
-                Console.WriteLine();
-            }
-        }
-
+        } //обновление карты новыми данными от роботов
 
         void DrawMap()
         {
@@ -368,6 +352,17 @@ namespace WindowsFormsApplication1
 
             globalMapPictureBox.Image = globalMap;
             robotMapPictureBox.Image = robotMap;
+        } //отрисовка карты
+
+        void RobotNumStringParse()
+        {
+            string[] robotNumsStrings = robotNumTextBox.Text.Split(' ');
+            robotNums = new int[robotNumsStrings.Count()];
+            for (int i = 0; i < robotNumsStrings.Count(); i++)
+            {
+                robotNums[i] = int.Parse(robotNumsStrings[i]);
+                Console.WriteLine(robotNums[i]);
+            }
         }
 
         private void GlobalMapMouseMove(object sender, MouseEventArgs e)
@@ -409,11 +404,6 @@ namespace WindowsFormsApplication1
 			draw = false;
 		}
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
         private void GlobalMapMouseDown(object sender, MouseEventArgs e)
 		{
 			draw = true;
@@ -426,5 +416,47 @@ namespace WindowsFormsApplication1
                 rightMouseButton = false;
             }
 		}
-	}
+
+        void ConsoleDebugOutput(string s)
+        {
+            if (s.Equals("coordinates"))
+            {
+                Console.WriteLine("Robot coordinates");
+                for (int i = 0; i < robots.Count(); i++)
+                {
+                    Console.WriteLine("{0}: {1} {2}", i, robots[i].GetCoordinates(true).yCoord, robots[i].GetCoordinates(true).xCoord);
+                }
+            }
+            else if (s.Equals("global map"))
+            {
+                Console.WriteLine("Global map\n");
+
+                for (int i = 0; i < y; i++)
+                {
+                    for (int j = 0; j < x; j++)
+                    {
+                        Console.Write(mapArray[i, j]);
+                    }
+                    Console.WriteLine();
+                }
+            }
+            else if (s.Equals("Robot map"))
+            {
+                Console.WriteLine("Robot map\n");
+                for (int i = 0; i < y; i++)
+                {
+                    for (int j = 0; j < x; j++)
+                    {
+                        Console.Write(robotMapArray[i, j]);
+                    }
+                    Console.WriteLine();
+                }
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+    }
 }
