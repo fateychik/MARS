@@ -38,14 +38,15 @@ namespace WindowsFormsApplication1
             sorted = new Dictionary<int, string>(); // hz
         }
 
-        public void Start()
+        public Robot[] Start()
         {
-            while (true)
-            {
+            //while (true)
+            //{
                 TerritoryInvestigation();
                 GiveTask();
                 CoordIncrement();
-            }
+            return robots;
+            //}
         }
 
         private void TerritoryInvestigation()                                                 //дополнение карты окружением роботов
@@ -68,8 +69,13 @@ namespace WindowsFormsApplication1
 
                         int i = coordinates.x + n <= 0 ? 0 : coordinates.x + n;
                         int j = coordinates.y + m <= 0 ? 0 : coordinates.y + m;
+//<<<<<<< HEAD
                         
                         if ((i, j) != robots[num].GetCoordinates(false) && fullMap[i, j] != 0 && robotMap[i, j] != 1)
+//=======
+
+                        //if ((i, j) != robots[num].GetCoordinates(false) && fullMap[i, j] != 0)
+//>>>>>>> origin/master
                         {
                             robotMap[i, j] = fullMap[i, j];                                   // отрисовываем карту
                             graph.AddVertex($"{i}_{j}");                                      // добавление вершины в граф лабиринта
