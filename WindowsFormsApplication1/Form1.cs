@@ -24,17 +24,13 @@ namespace WindowsFormsApplication1
         OpSystem OS;
         Robot[] robots;
 
-        int x, y; //значения размерности
+        int x = 10; //значения размерности
+        int y = 10;
 		bool draw = false;
         bool rightMouseButton = false;
 		int[,] mapArray;
         int[,] robotMapArray;
-//<<<<<<< HEAD
-        //bool currentMap = false; //0 - global, 1 - robot //смены карты больше нет
-//=======
-        //bool currentMap = true; //0 - global, 1 - robot
-        //Graph mapGraph = new Graph();
-//>>>>>>> origin/master
+        int robotNum = 1;
 
 		int sideSize = 10; //размер стороны квадрата
 		static int lineWidth = 1; //ширина линии квадрата
@@ -49,19 +45,24 @@ namespace WindowsFormsApplication1
 		Button saveButton = new Button ();
 		Button loadButton = new Button ();
 		Button createButton = new Button ();
-        //Button switchMapButton = new Button();
         Button savedMapsButton = new Button();
         Button startButton = new Button();
         Label xTrackBarLabel = new Label ();
 		Label yTrackBarLabel = new Label ();
+        Label robotNumBarLabel = new Label();
 		TrackBar xTrackBar = new TrackBar ();
 		TrackBar yTrackBar = new TrackBar ();
+        TrackBar robotNumBar = new TrackBar ();
 
         CheckedListBox savedMaps = new CheckedListBox();
 
         Size buttonSize = new Size (100, 25);
         int buttonShift = 115;
         int buttonLocationY = 10;
+        Size labelSize = new Size(40, 40);
+        int labelShift = 160;
+        int labelLocationY = 50;
+        int barShift = 40;
 
         Pen emptyRectPen = new Pen(Color.Gray, lineWidth); //линия пустой клетки
 		SolidBrush takenRectBrush = new SolidBrush(Color.Black); //зарисовка занятой клетки
@@ -88,11 +89,6 @@ namespace WindowsFormsApplication1
             createButton.Text = "Создать";
             createButton.MouseClick += new MouseEventHandler(CreateButtonClick);
 
-            /*switchMapButton.Location = new Point(10 + buttonShift * 3, buttonLocationY);
-            switchMapButton.Size = buttonSize;
-            switchMapButton.Text = "Карта";
-            switchMapButton.MouseClick += new MouseEventHandler(SwitchMap);*/
-
             startButton.Location = new Point(10 + buttonShift * 3, buttonLocationY);
             startButton.Size = buttonSize;
             startButton.Text = "Начать";
@@ -103,23 +99,35 @@ namespace WindowsFormsApplication1
             savedMapsButton.Text = "Загрузить";
             savedMapsButton.MouseClick += new MouseEventHandler(SavedMapChoiceButtonClick);
 
-            xTrackBarLabel.Location = new Point(10, 50);
-            xTrackBarLabel.Size = new Size(40, 20);
+            xTrackBarLabel.Location = new Point(10, labelLocationY);
+            xTrackBarLabel.Size = labelSize;
+            xTrackBarLabel.Text = String.Format("X: {0}", x);
 
-            xTrackBar.Location = new Point(50, 50);
+            xTrackBar.Location = new Point(xTrackBarLabel.Location.X + barShift, labelLocationY);
             xTrackBar.Minimum = 10;
             xTrackBar.Maximum = 100;
             xTrackBar.TickFrequency = 10;
             xTrackBar.Scroll += TrackBarScroll;
 
-            yTrackBarLabel.Location = new Point(170, 50);
-            yTrackBarLabel.Size = new Size(40, 20);
+            yTrackBarLabel.Location = new Point(xTrackBarLabel.Location.X + labelShift, labelLocationY);
+            yTrackBarLabel.Size = labelSize;
+            yTrackBarLabel.Text = String.Format("Y: {0}", y);
 
-            yTrackBar.Location = new Point(210, 50);
+            yTrackBar.Location = new Point(yTrackBarLabel.Location.X + barShift, labelLocationY);
             yTrackBar.Minimum = 10;
             yTrackBar.Maximum = 100;
             yTrackBar.TickFrequency = 10;
             yTrackBar.Scroll += TrackBarScroll;
+
+            robotNumBarLabel.Location = new Point(yTrackBarLabel.Location.X + labelShift, labelLocationY);
+            robotNumBarLabel.Size = new Size(labelSize.Width * 2 + 10, labelSize.Height);
+            robotNumBarLabel.Text = String.Format("Количество {0}\nроботов:", robotNum);
+
+            robotNumBar.Location = new Point(robotNumBarLabel.Location.X +robotNumBarLabel.Size.Width, labelLocationY);
+            robotNumBar.Minimum = 1;
+            robotNumBar.Maximum = 15;
+            robotNumBar.TickFrequency = 1;
+            robotNumBar.Scroll += TrackBarScroll;
 
             savedMaps.CheckOnClick = true;
             savedMaps.SelectionMode = SelectionMode.One;
@@ -143,24 +151,21 @@ namespace WindowsFormsApplication1
             Controls.Add(xTrackBar);
             Controls.Add(yTrackBarLabel);
             Controls.Add(yTrackBar);
-            //Controls.Add(switchMapButton);
+            Controls.Add(robotNumBarLabel);
+            Controls.Add(robotNumBar);
             Controls.Add(startButton);
             Controls.Add(globalMapPictureBox);
         } //отрисовка элементов интерфейса
-
-        /*void SwitchMap(object sender, EventArgs e)
-        {
-            globalMapPictureBox.Image = currentMap ? globalMap : robotMap;
-            currentMap = !currentMap;
-        }*/
 
         void TrackBarScroll(object sender, EventArgs e)
 		{
 			x = xTrackBar.Value;
 			y = yTrackBar.Value;
-			xTrackBarLabel.Text = String.Format ("X: {0}", xTrackBar.Value);
-			yTrackBarLabel.Text = String.Format ("Y: {0}", yTrackBar.Value);
-		} //сдвиг ползунка
+            robotNum = robotNumBar.Value;
+			xTrackBarLabel.Text = String.Format ("X: {0}", x);
+			yTrackBarLabel.Text = String.Format ("Y: {0}", y);
+            robotNumBarLabel.Text = String.Format("Количество {0}\nроботов:", robotNum);
+        } //сдвиг ползунка
 
 		void LoadButtonClick(object sender, EventArgs e)
 		{
@@ -183,7 +188,6 @@ namespace WindowsFormsApplication1
 
             y = file.Length;
             x = file[0].Length / 2;
-
             CreateMap();
 
             for (int i = 0; i < file.Length; i++)
@@ -198,6 +202,12 @@ namespace WindowsFormsApplication1
             Controls.Remove(savedMaps);
             Controls.Remove(savedMapsButton);
             Controls.Add(globalMapPictureBox);
+            xTrackBar.Value = x;
+            yTrackBar.Value = y;
+            xTrackBarLabel.Text = String.Format("X: {0}", x);
+            yTrackBarLabel.Text = String.Format("Y: {0}", y);
+            yTrackBar.Enabled = false;
+            xTrackBar.Enabled = false;
         }
 
         void SaveButtonClick(object sender, EventArgs e)
@@ -219,12 +229,12 @@ namespace WindowsFormsApplication1
 
         void StartButtonClick(object sender, EventArgs e)
         {
-            OS = new OpSystem(3, mapArray, (0, 1));
+            OS = new OpSystem(robotNum, mapArray, (0, 1));
             robots = OS.Start();
             RobotMapArrayUpdate();
             DrawMap();
             startButton.Text = "Шаг";
-            startButton.MouseClick -= new MouseEventHandler(SaveButtonClick);
+            startButton.MouseClick -= StartButtonClick;
             startButton.MouseClick += new MouseEventHandler(StepButtonClick);
         }
 
@@ -261,7 +271,6 @@ namespace WindowsFormsApplication1
             globalMap = new Bitmap(x * sideSize + 1, y * sideSize + 1);
             robotMapPictureBox.Size = new Size(x * sideSize + 1, y * sideSize + 1);
             robotMapPictureBox.Location = new Point(globalMapPictureBox.Location.X + x * sideSize + sideSize, globalMapPictureBox.Location.Y);
-//>>>>>>> origin/master
             robotMap = new Bitmap(x * sideSize + 1, y * sideSize + 1);
             Controls.Add(robotMapPictureBox);
             globalMapGraphics = Graphics.FromImage(globalMap);
@@ -280,7 +289,7 @@ namespace WindowsFormsApplication1
 
         void RobotMapArrayUpdate()
         {
-
+            //ConsoleOutput();
             for (int l = 0; l < robots.Count(); l++)
             {
                 robotMapArray[robots[l].GetCoordinates(false).xCoord, robots[l].GetCoordinates(false).yCoord] = 1;
@@ -294,16 +303,41 @@ namespace WindowsFormsApplication1
                     {
                         int i = robots[l].GetCoordinates(true).xCoord + n;
                         int j = robots[l].GetCoordinates(true).yCoord + m;
-                        if (i < 0 || i == x || j < 0 || j == y)
+                        if (i < 0 || i == y || j < 0 || j == x)
                             continue;
                         if (n== 0 && m == 0)
                             robotMapArray[i, j] = 3;
-                        else
+                        else if (robotMapArray[i, j] != 3)
                             robotMapArray[i, j] = mapArray[i, j];
                     }
                 }
             }
+
         }
+
+        void ConsoleOutput()
+        {
+            Console.WriteLine("Global map\n");
+
+            for (int i = 0; i < y; i++)
+            {
+                for (int j = 0; j < x; j++)
+                {
+                    Console.Write(mapArray[i, j]);
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine("Robot map\n");
+            for (int i = 0; i < y; i++)
+            {
+                for (int j = 0; j < x; j++)
+                {
+                    Console.Write(robotMapArray[i, j]);
+                }
+                Console.WriteLine();
+            }
+        }
+
 
         void DrawMap()
         {
