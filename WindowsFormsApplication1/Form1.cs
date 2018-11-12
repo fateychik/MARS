@@ -23,8 +23,8 @@ namespace WindowsFormsApplication1
             InterfaceDraw();
         }
 
-        OpSystem OS;
-        Robot[] robots;
+        //OpSystem OS;
+        //Robot[] robots;
 
         int x = 10; //значения размерности
         int y = 10;
@@ -32,20 +32,20 @@ namespace WindowsFormsApplication1
         bool rightMouseButton = false;
 		int[,] mapArray;
         int[,] robotMapArray;
+        List<(int x, int y)> prevCoordList;
 
-        bool currentMap = false; //0 - global, 1 - robot
+        //bool currentMap = false; //0 - global, 1 - robot
         Thread os; // поток для вычисления OS
         Thread map; // ПОТОК ДЛЯ ОТРИСОВКИ КАРТЫ С РОБОТОВ
         ConcurrentQueue<List<(int x, int y)>> robotsCoordinate; // очередь для передачи координат робота между потоками
         delegate void RobotMap(Bitmap bmp); // для изменения пикчербокса из стороннег потока
+        int sleepTime = 200;
 
-        //отрисовка элементов карты
         int sideSize = 10; //размер стороны квадрата
+        static int lineWidth = 1; //ширина линии квадрата
 
         int robotNum = 1;
         int[] robotNums;
-
-		static int lineWidth = 1; //ширина линии квадрата
 
 		PictureBox globalMapPictureBox = new PictureBox();
         PictureBox robotMapPictureBox = new PictureBox();
@@ -189,7 +189,7 @@ namespace WindowsFormsApplication1
 		{
             Controls.Remove(globalMapPictureBox);
 
-            string[] filesNames = Directory.GetFiles(@"E:\");
+            string[] filesNames = Directory.GetFiles(@"C:\MARS maps");
 
             savedMaps.Items.AddRange(filesNames);
             Controls.Add(savedMaps);
@@ -291,22 +291,25 @@ namespace WindowsFormsApplication1
             DrawMap();
         }
 
-        void RobotMapArrayUpdate()
+        void RobotMapArrayUpdate(List <(int x, int y)> coordList)
         {
             //ConsoleOutput();
-            for (int l = 0; l < robots.Count(); l++)
+            if (prevCoordList != null)
             {
-                robotMapArray[robots[l].GetCoordinates(false).xCoord, robots[l].GetCoordinates(false).yCoord] = 1;
+                for (int l = 0; l < prevCoordList.Count(); l++)
+                {
+                    robotMapArray[prevCoordList[l].x, prevCoordList[l].y] = 1;
+                }
             }
 
-            for (int l = 0; l < robots.Count(); l++)
+            for (int l = 0; l < coordList.Count(); l++)
             {
                 for (int n = -1; n < 2; n++)
                 {
                     for (int m = -1; m < 2; m++)
                     {
-                        int i = robots[l].GetCoordinates(true).xCoord + n;
-                        int j = robots[l].GetCoordinates(true).yCoord + m;
+                        int i = coordList[l].x + n;
+                        int j = coordList[l].y + m;
                         if (i < 0 || i == y || j < 0 || j == x)
                             continue;
                         if (n== 0 && m == 0)
@@ -316,7 +319,7 @@ namespace WindowsFormsApplication1
                     }
                 }
             }
-
+            prevCoordList = coordList;
         } //обновление карты новыми данными от роботов
 
         void DrawMap()
@@ -346,8 +349,10 @@ namespace WindowsFormsApplication1
                 }
             }
 
-            globalMapPictureBox.Image = globalMap;
-            robotMapPictureBox.Image = robotMap;
+            //globalMapPictureBox.Image = globalMap;
+            GlobalMapInForm(globalMap);
+            //robotMapPictureBox.Image = robotMap;
+            RobotMapInForm(robotMap);
         } //отрисовка карты
 
         void RobotNumStringParse()
@@ -405,14 +410,13 @@ namespace WindowsFormsApplication1
             }
 		}
 
-
         private void StartOS()
         {
-            OpSystem OS = new OpSystem(6, mapArray, (0, 1));
+            OpSystem OS = new OpSystem(robotNum, mapArray, (0, 1));
             while (true)
             {
                 robotsCoordinate.Enqueue(OS.CalculationStep());
-                Thread.Sleep(1000);
+                Thread.Sleep(sleepTime);
             }
         }
 
@@ -421,27 +425,38 @@ namespace WindowsFormsApplication1
             while (true)
             {
                 if (!robotsCoordinate.TryDequeue(out var coorList)) continue; // назови как-нибудь coorList // эт проверка очереди
-
-                //RobotMapInForm(Bitmap); // эта функция используется для вызова отрисовки 
+                RobotMapArrayUpdate(coorList);
+                DrawMap();
             }
         }
 
         public void RobotMapInForm(Bitmap bmp) // вместо globalMapPictureBox подставить необходимый pictureBox
         {
-            if (globalMapPictureBox.InvokeRequired)
+            if (robotMapPictureBox.InvokeRequired)
             {
                 RobotMap a = new RobotMap(RobotMapInForm);
+                robotMapPictureBox.Invoke(a, new object[] { bmp });
+            }
+            else
+            {
+                robotMapPictureBox.Image = bmp;
+            }
+        }
+
+        public void GlobalMapInForm(Bitmap bmp) // вместо globalMapPictureBox подставить необходимый pictureBox
+        {
+            if (globalMapPictureBox.InvokeRequired)
+            {
+                RobotMap a = new RobotMap(GlobalMapInForm);
                 globalMapPictureBox.Invoke(a, new object[] { bmp });
             }
             else
             {
-                globalMapPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
                 globalMapPictureBox.Image = bmp;
-                globalMapPictureBox.Refresh();
             }
         }
 
-        void ConsoleDebugOutput(string s)
+        /*void ConsoleDebugOutput(string s)
         {
             if (s.Equals("coordinates"))
             {
@@ -476,7 +491,7 @@ namespace WindowsFormsApplication1
                     Console.WriteLine();
                 }
             }
-        }
+        }*/
 
         private void Form1_Load(object sender, EventArgs e)
         {
