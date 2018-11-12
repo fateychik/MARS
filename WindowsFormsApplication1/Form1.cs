@@ -8,6 +8,8 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using System.IO;
+using System.Threading;
+using System.Collections.Concurrent;
 
 namespace WindowsFormsApplication1
 {
@@ -30,10 +32,19 @@ namespace WindowsFormsApplication1
         bool rightMouseButton = false;
 		int[,] mapArray;
         int[,] robotMapArray;
+
+        bool currentMap = false; //0 - global, 1 - robot
+        Thread os; // поток для вычисления OS
+        Thread map; // ПОТОК ДЛЯ ОТРИСОВКИ КАРТЫ С РОБОТОВ
+        ConcurrentQueue<List<(int x, int y)>> robotsCoordinate; // очередь для передачи координат робота между потоками
+        delegate void RobotMap(Bitmap bmp); // для изменения пикчербокса из стороннег потока
+
+        //отрисовка элементов карты
+        int sideSize = 10; //размер стороны квадрата
+
         int robotNum = 1;
         int[] robotNums;
 
-		int sideSize = 10; //размер стороны квадрата
 		static int lineWidth = 1; //ширина линии квадрата
 
 		PictureBox globalMapPictureBox = new PictureBox();
@@ -178,7 +189,7 @@ namespace WindowsFormsApplication1
 		{
             Controls.Remove(globalMapPictureBox);
 
-            string[] filesNames = Directory.GetFiles(@"c:\MARS maps");
+            string[] filesNames = Directory.GetFiles(@"E:\");
 
             savedMaps.Items.AddRange(filesNames);
             Controls.Add(savedMaps);
@@ -219,7 +230,6 @@ namespace WindowsFormsApplication1
 
         void SaveButtonClick(object sender, EventArgs e)
 		{
-            
             string fileName = System.IO.Path.Combine(@"c:\MARS maps", System.IO.Path.GetRandomFileName());
 
             using (StreamWriter map = new StreamWriter(fileName + ".txt", true, System.Text.Encoding.Default))
@@ -236,40 +246,26 @@ namespace WindowsFormsApplication1
 
         void StartButtonClick(object sender, EventArgs e)
         {
-            OS = new OpSystem(robotNum, mapArray, (0, 1));
-            robots = OS.Start();
-            RobotMapArrayUpdate();
-            DrawMap();
-            startButton.Text = "Шаг";
-            startButton.MouseClick -= StartButtonClick;
-            startButton.MouseClick += new MouseEventHandler(StepButtonClick);
+            robotsCoordinate = new ConcurrentQueue<List<(int x, int y)>>();
+            os = new Thread(StartOS);
+            os.Start();
+            map = new Thread(DrawingRobotsMap);
+            map.Start();
         }
 
-        void StepButtonClick(object sender, EventArgs e)
+        /*void StepButtonClick(object sender, EventArgs e)
         {
             robots = OS.Start();
             RobotMapArrayUpdate();
             DrawMap();
             //ConsoleDebugOutput();
-        }
+        }*/
 
 		void CreateButtonClick(object sender, EventArgs e)
 		{
 			mapArray = new int[y, x];
             robotMapArray = new int[y, x];
             CreateMap();
-/*<<<<<<< HEAD
-		} //нажатие на кнопку создания карты
-
-		void CreateMap()
-		{
-			this.Size = new Size(x * sideSize + 1000, y * sideSize + 150); //окно программы
-
-			globalMapPictureBox.Size = new Size(x * sideSize+1, y * sideSize+1); //окно карты
-
-			globalMap = new Bitmap(x * sideSize+1, y * sideSize+1);
-
-=======*/
         } //нажатие на кнопку создания карты
 
         void CreateMap()
@@ -376,20 +372,12 @@ namespace WindowsFormsApplication1
                     if (!rightMouseButton)
                     {
                         mapArray[squareY, squareX] = 1;
-//<<<<<<< HEAD
-
-//=======
-//>>>>>>> origin/master
                         globalMapGraphics.FillRectangle(emptyRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
                         globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
                     }
                     else
                     {
                         mapArray[squareY, squareX] = 0;
-//<<<<<<< HEAD
-
-//=======
-//>>>>>>> origin/master
                         globalMapGraphics.FillRectangle(takenRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
                         globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
                     }
@@ -416,6 +404,42 @@ namespace WindowsFormsApplication1
                 rightMouseButton = false;
             }
 		}
+
+
+        private void StartOS()
+        {
+            OpSystem OS = new OpSystem(6, mapArray, (0, 1));
+            while (true)
+            {
+                robotsCoordinate.Enqueue(OS.CalculationStep());
+                Thread.Sleep(1000);
+            }
+        }
+
+        private void DrawingRobotsMap()
+        {
+            while (true)
+            {
+                if (!robotsCoordinate.TryDequeue(out var coorList)) continue; // назови как-нибудь coorList // эт проверка очереди
+
+                //RobotMapInForm(Bitmap); // эта функция используется для вызова отрисовки 
+            }
+        }
+
+        public void RobotMapInForm(Bitmap bmp) // вместо globalMapPictureBox подставить необходимый pictureBox
+        {
+            if (globalMapPictureBox.InvokeRequired)
+            {
+                RobotMap a = new RobotMap(RobotMapInForm);
+                globalMapPictureBox.Invoke(a, new object[] { bmp });
+            }
+            else
+            {
+                globalMapPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+                globalMapPictureBox.Image = bmp;
+                globalMapPictureBox.Refresh();
+            }
+        }
 
         void ConsoleDebugOutput(string s)
         {
