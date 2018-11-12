@@ -51,7 +51,7 @@ namespace WindowsFormsApplication1
             return temp;
         }
 
-        public int Start()
+        public int Start(out List<int> distance)
         {
             int counter = 0;
             while (busy.Any() && tasks.Any())
@@ -61,6 +61,11 @@ namespace WindowsFormsApplication1
                 CoordIncrement();
                 counter++;
             }
+
+            distance = new List<int>();
+            foreach (var i in robots)
+                distance.Add(i.distance);
+
             return counter;
         }
 
@@ -192,6 +197,7 @@ namespace WindowsFormsApplication1
                 robots[i].prevCoordinates = robots[i].coordinates;
                 robots[i].coordinates = (int.Parse(path[0]), int.Parse(path[1]));
                 robots[i].path.RemoveAt(0);
+                robots[i].distance++;
             }
         }
     }

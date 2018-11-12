@@ -9,6 +9,7 @@ namespace WindowsFormsApplication1
     {
 
         public bool status;                         // 1-свободен 0-занят
+        public int distance;
         public (int x, int y) coordinates;
         public (int x, int y) prevCoordinates;
         public List<string> path;
@@ -22,6 +23,7 @@ namespace WindowsFormsApplication1
             prevCoordinates.x = poit.x;
             prevCoordinates.y = poit.y;
             status = true;
+            distance = 0;
 
             ratingTasks = new Dictionary<string, int>();
         }

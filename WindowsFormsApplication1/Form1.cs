@@ -23,18 +23,15 @@ namespace WindowsFormsApplication1
             InterfaceDraw();
         }
 
-        //OpSystem OS;
-        //Robot[] robots;
-
         int x = 10; //значения размерности
         int y = 10;
 		bool draw = false;
         bool rightMouseButton = false;
 		int[,] mapArray;
         int[,] robotMapArray;
+
         List<(int x, int y)> prevCoordList;
 
-        //bool currentMap = false; //0 - global, 1 - robot
         Thread os; // поток для вычисления OS
         Thread map; // ПОТОК ДЛЯ ОТРИСОВКИ КАРТЫ С РОБОТОВ
         ConcurrentQueue<List<(int x, int y)>> robotsCoordinate; // очередь для передачи координат робота между потоками
@@ -253,14 +250,6 @@ namespace WindowsFormsApplication1
             map.Start();
         }
 
-        /*void StepButtonClick(object sender, EventArgs e)
-        {
-            robots = OS.Start();
-            RobotMapArrayUpdate();
-            DrawMap();
-            //ConsoleDebugOutput();
-        }*/
-
 		void CreateButtonClick(object sender, EventArgs e)
 		{
 			mapArray = new int[y, x];
@@ -310,6 +299,7 @@ namespace WindowsFormsApplication1
                     {
                         int i = coordList[l].x + n;
                         int j = coordList[l].y + m;
+
                         if (i < 0 || i == y || j < 0 || j == x)
                             continue;
                         if (n== 0 && m == 0)
@@ -344,14 +334,10 @@ namespace WindowsFormsApplication1
                         robotMapGraphics.FillRectangle(robotRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
 
                     robotMapGraphics.DrawRectangle(emptyRectPen, j * (sideSize), i * (sideSize), sideSize, sideSize);
-                    
-
                 }
             }
 
-            //globalMapPictureBox.Image = globalMap;
             GlobalMapInForm(globalMap);
-            //robotMapPictureBox.Image = robotMap;
             RobotMapInForm(robotMap);
         } //отрисовка карты
 
@@ -409,6 +395,7 @@ namespace WindowsFormsApplication1
                 rightMouseButton = false;
             }
 		}
+
 
         private void StartOS()
         {
