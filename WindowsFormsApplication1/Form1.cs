@@ -23,9 +23,6 @@ namespace WindowsFormsApplication1
             InterfaceDraw();
         }
 
-        OpSystem OS;
-        Robot[] robots;
-
         int x = 10; //значения размерности
         int y = 10;
 		bool draw = false;
@@ -33,7 +30,6 @@ namespace WindowsFormsApplication1
 		int[,] mapArray;
         int[,] robotMapArray;
 
-        bool currentMap = false; //0 - global, 1 - robot
         Thread os; // поток для вычисления OS
         Thread map; // ПОТОК ДЛЯ ОТРИСОВКИ КАРТЫ С РОБОТОВ
         ConcurrentQueue<List<(int x, int y)>> robotsCoordinate; // очередь для передачи координат робота между потоками
