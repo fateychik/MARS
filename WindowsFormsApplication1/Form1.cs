@@ -8,6 +8,8 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using System.IO;
+using System.Threading;
+using System.Collections.Concurrent;
 
 namespace WindowsFormsApplication1
 {
@@ -27,9 +29,13 @@ namespace WindowsFormsApplication1
 		int[,] mapArray;
         int[,] robotMapArray;
         bool currentMap = false; //0 - global, 1 - robot
+        Thread os; // поток для вычисления OS
+        Thread map; // ПОТОК ДЛЯ ОТРИСОВКИ КАРТЫ С РОБОТОВ
+        ConcurrentQueue<List<(int x, int y)>> robotsCoordinate; // очередь для передачи координат робота между потоками
+        delegate void RobotMap(Bitmap bmp); // для изменения пикчербокса из стороннег потока
 
-		//отрисовка элементов карты
-		int sideSize = 10; //размер стороны квадрата
+        //отрисовка элементов карты
+        int sideSize = 10; //размер стороны квадрата
 		static int lineWidth = 1; //ширина линии квадрата
 
 		PictureBox globalMapPictureBox = new PictureBox();
@@ -153,7 +159,7 @@ namespace WindowsFormsApplication1
 		{
             Controls.Remove(globalMapPictureBox);
 
-            string[] filesNames = Directory.GetFiles(@"c:\MARS maps");
+            string[] filesNames = Directory.GetFiles(@"E:\");
 
             savedMaps.Items.AddRange(filesNames);
             Controls.Add(savedMaps);
@@ -189,8 +195,11 @@ namespace WindowsFormsApplication1
 
         void SaveButtonClick(object sender, EventArgs e)
 		{
-            OpSystem OS = new OpSystem(3, mapArray, (0, 1));
-            OS.Start();
+            robotsCoordinate = new ConcurrentQueue<List<(int x, int y)>>();
+            os = new Thread(StartOS);
+            os.Start();
+            map = new Thread(DrawingRobotsMap);
+            map.Start();
             
             /*string fileName = System.IO.Path.Combine(@"c:\MARS maps", System.IO.Path.GetRandomFileName());
 
@@ -314,5 +323,40 @@ namespace WindowsFormsApplication1
                 rightMouseButton = false;
             }
 		}
-	}
+
+        private void StartOS()
+        {
+            OpSystem OS = new OpSystem(6, mapArray, (0, 1));
+            while (true)
+            {
+                robotsCoordinate.Enqueue(OS.CalculationStep());
+                Thread.Sleep(1000);
+            }
+        }
+
+        private void DrawingRobotsMap()
+        {
+            while (true)
+            {
+                if (!robotsCoordinate.TryDequeue(out var coorList)) continue; // назови как-нибудь coorList // эт проверка очереди
+
+                //RobotMapInForm(Bitmap); // эта функция используется для вызова отрисовки 
+            }
+        }
+
+        public void RobotMapInForm(Bitmap bmp) // вместо globalMapPictureBox подставить необходимый pictureBox
+        {
+            if (globalMapPictureBox.InvokeRequired)
+            {
+                RobotMap a = new RobotMap(RobotMapInForm);
+                globalMapPictureBox.Invoke(a, new object[] { bmp });
+            }
+            else
+            {
+                globalMapPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+                globalMapPictureBox.Image = bmp;
+                globalMapPictureBox.Refresh();
+            }
+        }
+    }
 }

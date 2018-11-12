@@ -38,14 +38,30 @@ namespace WindowsFormsApplication1
             sorted = new Dictionary<int, string>(); // hz
         }
 
-        public void Start()
+        public List<(int, int)> CalculationStep()
         {
-            while (true)
+            TerritoryInvestigation();
+            GiveTask();
+            CoordIncrement();
+
+            List<(int, int)> temp = new List<(int, int)>();
+            foreach (var i in robots)
+                temp.Add(i.coordinates);
+
+            return temp;
+        }
+
+        public int Start()
+        {
+            int counter = 0;
+            while (busy.Any() && tasks.Any())
             {
                 TerritoryInvestigation();
                 GiveTask();
                 CoordIncrement();
+                counter++;
             }
+            return counter;
         }
 
         private void TerritoryInvestigation()                                                 //дополнение карты окружением роботов
@@ -151,7 +167,7 @@ namespace WindowsFormsApplication1
                     sorted.Remove(temp);
                     robots[temp].ratingTasks[task] = int.MaxValue;
 
-                    if (robots[temp].ratingTasks[robots[i].MaxRatingTask] != int.MaxValue)
+                    if (robots[temp].ratingTasks[robots[temp].MaxRatingTask] != int.MaxValue)
                         Sort(temp, robots[temp].MaxRatingTask);
                 }
             }
