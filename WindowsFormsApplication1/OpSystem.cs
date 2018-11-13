@@ -38,7 +38,7 @@ namespace WindowsFormsApplication1
             sorted = new Dictionary<int, string>(); // hz
         }
 
-        public List<(int, int)> CalculationStep()
+        public List<(int, int)> CalculationStep(out bool end)
         {
             TerritoryInvestigation();
             GiveTask();
@@ -48,13 +48,14 @@ namespace WindowsFormsApplication1
             foreach (var i in robots)
                 temp.Add(i.coordinates);
 
+            end = busy.Any() || tasks.Any();
             return temp;
         }
 
         public int Start(out List<int> distance)
         {
             int counter = 0;
-            while (busy.Any() && tasks.Any())
+            while (busy.Any() || tasks.Any())
             {
                 TerritoryInvestigation();
                 GiveTask();

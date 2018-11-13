@@ -23,7 +23,7 @@ namespace WindowsFormsApplication1
             InterfaceDraw();
         }
 
-        int x = 10; //значения размерности
+        int x = 10;                                             // значения размерности
         int y = 10;
 		bool draw = false;
         bool rightMouseButton = false;
@@ -32,14 +32,14 @@ namespace WindowsFormsApplication1
 
         List<(int x, int y)> prevCoordList;
 
-        Thread os; // поток для вычисления OS
-        Thread map; // ПОТОК ДЛЯ ОТРИСОВКИ КАРТЫ С РОБОТОВ
+        Thread os;                                              // поток для вычисления OS
+        Thread map;                                             // поток для отрисовки карты с роботов
         ConcurrentQueue<List<(int x, int y)>> robotsCoordinate; // очередь для передачи координат робота между потоками
-        delegate void RobotMap(Bitmap bmp); // для изменения пикчербокса из стороннег потока
+        delegate void RobotMap(Bitmap bmp);                     // для изменения пикчербокса из стороннег потока
         int sleepTime = 200;
 
-        int sideSize = 10; //размер стороны квадрата
-        static int lineWidth = 1; //ширина линии квадрата
+        int sideSize = 10;                                      // размер стороны квадрата
+        static int lineWidth = 1;                               // ширина линии квадрата
 
         int robotNum = 1;
         int[] robotNums;
@@ -75,7 +75,7 @@ namespace WindowsFormsApplication1
         int barShift = 40;
         Size textBoxSize = new Size(185, 40);
 
-        Pen emptyRectPen = new Pen(Color.Gray, lineWidth); //линия пустой клетки
+        Pen emptyRectPen = new Pen(Color.Gray, lineWidth);       //линия пустой клетки
 		SolidBrush takenRectBrush = new SolidBrush(Color.Black); //зарисовка занятой клетки
         SolidBrush emptyRectBrush = new SolidBrush(Color.LightGray);
         SolidBrush unknownRectBrush = new SolidBrush(Color.LightBlue);
@@ -400,24 +400,28 @@ namespace WindowsFormsApplication1
         private void StartOS()
         {
             OpSystem OS = new OpSystem(robotNum, mapArray, (0, 1));
-            while (true)
+            bool end = true;
+            while (end)
             {
-                robotsCoordinate.Enqueue(OS.CalculationStep());
+                robotsCoordinate.Enqueue(OS.CalculationStep(out end));
                 Thread.Sleep(sleepTime);
             }
+            List<(int, int)> temp = new List<(int, int)>();
+            robotsCoordinate.Enqueue(temp); // отправляем пустой список, в качестве индикатора об окончании работы алгоритма
         }
 
         private void DrawingRobotsMap()
         {
             while (true)
             {
-                if (!robotsCoordinate.TryDequeue(out var coorList)) continue; // назови как-нибудь coorList // эт проверка очереди
+                if (!robotsCoordinate.TryDequeue(out var coorList)) continue; // проверка очереди
+                if (!coorList.Any()) break; // проверка на окончание передачи
                 RobotMapArrayUpdate(coorList);
                 DrawMap();
             }
         }
 
-        public void RobotMapInForm(Bitmap bmp) // вместо globalMapPictureBox подставить необходимый pictureBox
+        public void RobotMapInForm(Bitmap bmp)
         {
             if (robotMapPictureBox.InvokeRequired)
             {
@@ -430,9 +434,9 @@ namespace WindowsFormsApplication1
             }
         }
 
-        public void GlobalMapInForm(Bitmap bmp) // вместо globalMapPictureBox подставить необходимый pictureBox
+        public void GlobalMapInForm(Bitmap bmp)
         {
-            if (globalMapPictureBox.InvokeRequired)
+            if (robotMapPictureBox.InvokeRequired)
             {
                 RobotMap a = new RobotMap(GlobalMapInForm);
                 globalMapPictureBox.Invoke(a, new object[] { bmp });
