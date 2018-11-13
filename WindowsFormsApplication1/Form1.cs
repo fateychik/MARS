@@ -10,6 +10,10 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Threading;
 using System.Collections.Concurrent;
+using System.Windows.Forms.DataVisualization.Charting;
+
+
+
 
 namespace WindowsFormsApplication1
 {
@@ -27,6 +31,8 @@ namespace WindowsFormsApplication1
         int y = 10;
 		bool draw = false;
         bool rightMouseButton = false;
+        bool startPointIsSet = false;
+        (int x, int y) startPoint;
 		int[,] mapArray;
         int[,] robotMapArray;
 
@@ -36,6 +42,7 @@ namespace WindowsFormsApplication1
         Thread map;                                             // поток для отрисовки карты с роботов
         ConcurrentQueue<List<(int x, int y)>> robotsCoordinate; // очередь для передачи координат робота между потоками
         delegate void RobotMap(Bitmap bmp);                     // для изменения пикчербокса из стороннег потока
+        delegate void robNumTextBoxDelegate(string resStr);
         int sleepTime = 200;
 
         int sideSize = 10;                                      // размер стороны квадрата
@@ -43,6 +50,8 @@ namespace WindowsFormsApplication1
 
         int robotNum = 1;
         int[] robotNums;
+        int steps;
+        int[] stepsArray;
 
 		PictureBox globalMapPictureBox = new PictureBox();
         PictureBox robotMapPictureBox = new PictureBox();
@@ -80,6 +89,7 @@ namespace WindowsFormsApplication1
         SolidBrush emptyRectBrush = new SolidBrush(Color.LightGray);
         SolidBrush unknownRectBrush = new SolidBrush(Color.LightBlue);
         SolidBrush robotRectBrush = new SolidBrush(Color.Red);
+        SolidBrush startPointRectBrush = new SolidBrush(Color.Orange);
 
         void InitializeComponents()
         {
@@ -209,7 +219,13 @@ namespace WindowsFormsApplication1
             {
                 var temp = file[i].Split(' ');
                 for (int j = 0; j < temp.Length - 1; j++) //последний элемент строки - символ окончания строки
+                {
                     mapArray[i, j] = int.Parse(temp[j]);
+                    if (mapArray[i, j] == 2)
+                    {
+                        startPoint = (i, j);
+                    }
+                }
             }
 
             DrawMap();
@@ -243,11 +259,56 @@ namespace WindowsFormsApplication1
 
         void StartButtonClick(object sender, EventArgs e)
         {
-            robotsCoordinate = new ConcurrentQueue<List<(int x, int y)>>();
-            os = new Thread(StartOS);
-            os.Start();
-            map = new Thread(DrawingRobotsMap);
-            map.Start();
+            if (robotNumTextBox.Text == "")
+            {
+                robotsCoordinate = new ConcurrentQueue<List<(int x, int y)>>();
+                os = new Thread(StartOS);
+                os.Start();
+                map = new Thread(DrawingRobotsMap);
+                map.Start();
+            }
+            else
+            {
+                sleepTime = 0;
+                RobotNumStringParse();
+                stepsArray = new int[robotNums.Count()];
+                for (int i = 0; i < robotNums.Count(); i++)
+                {
+                    robotNum = robotNums[i];  
+                    robotsCoordinate = new ConcurrentQueue<List<(int x, int y)>>();
+                    os = new Thread(StartOS);
+                    os.Start();
+                    while (os.IsAlive)
+                    {
+
+                    }
+                    stepsArray[i] = steps;
+                }
+                StepChartDraw();
+            }
+        }
+
+        void StepChartDraw()
+        {
+            Form ChartForm = new Form();
+            ChartForm.Size = new Size(1000, 800);
+            ChartForm.Text = "Статистика";
+            ChartForm.Show();
+
+            Chart stepChart = new Chart();
+            stepChart.Size = new Size(800, 800);
+
+            ChartArea stepChartArea = new ChartArea();
+            stepChart.ChartAreas.Add(stepChartArea);
+
+            Series stepChartSeries = new Series();
+            stepChartSeries.Name = "Step chart";
+            stepChartSeries.ChartType = SeriesChartType.Line;
+            stepChartSeries.Points.DataBindXY(robotNums, stepsArray);
+            stepChartSeries.IsValueShownAsLabel = true;
+            stepChart.Series.Add(stepChartSeries);
+            ChartForm.Controls.Add(stepChart);
+            stepChart.Invalidate();
         }
 
 		void CreateButtonClick(object sender, EventArgs e)
@@ -320,8 +381,10 @@ namespace WindowsFormsApplication1
                 {
                     if (mapArray[i, j] == 0)
                         globalMapGraphics.FillRectangle(takenRectBrush, j * (sideSize), i * (sideSize), sideSize + 1, sideSize + 1);
-                    else
+                    if (mapArray[i, j] == 1)
                         globalMapGraphics.FillRectangle(emptyRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
+                    if (mapArray[i, j] == 2)
+                        globalMapGraphics.FillRectangle(startPointRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
                     globalMapGraphics.DrawRectangle(emptyRectPen, j * (sideSize), i * (sideSize), sideSize, sideSize);
 
                     if (robotMapArray[i, j] == 0)
@@ -332,7 +395,8 @@ namespace WindowsFormsApplication1
                         robotMapGraphics.FillRectangle(unknownRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
                     if (robotMapArray[i, j] == 3)
                         robotMapGraphics.FillRectangle(robotRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
-
+                    if (mapArray[i, j] == 2)
+                        robotMapGraphics.FillRectangle(startPointRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
                     robotMapGraphics.DrawRectangle(emptyRectPen, j * (sideSize), i * (sideSize), sideSize, sideSize);
                 }
             }
@@ -348,7 +412,6 @@ namespace WindowsFormsApplication1
             for (int i = 0; i < robotNumsStrings.Count(); i++)
             {
                 robotNums[i] = int.Parse(robotNumsStrings[i]);
-                Console.WriteLine(robotNums[i]);
             }
         }
 
@@ -362,9 +425,20 @@ namespace WindowsFormsApplication1
                 {
                     if (!rightMouseButton)
                     {
-                        mapArray[squareY, squareX] = 1;
-                        globalMapGraphics.FillRectangle(emptyRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
-                        globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
+                        if (!startPointIsSet)
+                        {
+                            mapArray[squareY, squareX] = 2;
+                            globalMapGraphics.FillRectangle(startPointRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
+                            globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
+                            startPoint = (squareY, squareX);
+                            startPointIsSet = !startPointIsSet;
+                        }
+                        else if (mapArray[squareY, squareX] != 2)
+                        {
+                            mapArray[squareY, squareX] = 1;
+                            globalMapGraphics.FillRectangle(emptyRectBrush, squareX * sideSize, squareY * sideSize, sideSize + 1, sideSize + 1);
+                            globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
+                        }
                     }
                     else
                     {
@@ -396,28 +470,46 @@ namespace WindowsFormsApplication1
             }
 		}
 
-
         private void StartOS()
         {
-            OpSystem OS = new OpSystem(robotNum, mapArray, (0, 1));
+            OpSystem OS = new OpSystem(robotNum, mapArray, startPoint);
             bool end = true;
+            steps = 0;
             while (end)
             {
                 robotsCoordinate.Enqueue(OS.CalculationStep(out end));
                 Thread.Sleep(sleepTime);
+                steps++;
             }
             List<(int, int)> temp = new List<(int, int)>();
             robotsCoordinate.Enqueue(temp); // отправляем пустой список, в качестве индикатора об окончании работы алгоритма
+            os.Abort();
         }
 
         private void DrawingRobotsMap()
         {
+            
             while (true)
             {
                 if (!robotsCoordinate.TryDequeue(out var coorList)) continue; // проверка очереди
                 if (!coorList.Any()) break; // проверка на окончание передачи
                 RobotMapArrayUpdate(coorList);
                 DrawMap();
+                //steps++;
+            }
+            ResultOutput(String.Format("Роботы: {0} Шаги: {1}", robotNum, steps));
+        }
+
+        public void ResultOutput(string s)
+        {
+            if (robotNumTextBox.InvokeRequired)
+            {
+                robNumTextBoxDelegate tB = new robNumTextBoxDelegate(ResultOutput);
+                robotNumTextBox.Invoke(tB, new object[] { s });
+            }
+            else
+            {
+                robotNumTextBox.Text = s;
             }
         }
 
@@ -488,5 +580,7 @@ namespace WindowsFormsApplication1
         {
 
         }
+
+
     }
 }
