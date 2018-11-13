@@ -10,6 +10,10 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Threading;
 using System.Collections.Concurrent;
+using System.Windows.Forms.DataVisualization.Charting;
+
+
+
 
 namespace WindowsFormsApplication1
 {
@@ -265,12 +269,12 @@ namespace WindowsFormsApplication1
             }
             else
             {
+                sleepTime = 0;
                 RobotNumStringParse();
                 stepsArray = new int[robotNums.Count()];
                 for (int i = 0; i < robotNums.Count(); i++)
                 {
-                    robotNum = robotNums[i];
-                    sleepTime = 0;
+                    robotNum = robotNums[i];  
                     robotsCoordinate = new ConcurrentQueue<List<(int x, int y)>>();
                     os = new Thread(StartOS);
                     os.Start();
@@ -280,13 +284,31 @@ namespace WindowsFormsApplication1
                     }
                     stepsArray[i] = steps;
                 }
-                StepChart();
+                StepChartDraw();
             }
         }
 
-        void StepChart()
+        void StepChartDraw()
         {
+            Form ChartForm = new Form();
+            ChartForm.Size = new Size(1000, 800);
+            ChartForm.Text = "Статистика";
+            ChartForm.Show();
 
+            Chart stepChart = new Chart();
+            stepChart.Size = new Size(800, 800);
+
+            ChartArea stepChartArea = new ChartArea();
+            stepChart.ChartAreas.Add(stepChartArea);
+
+            Series stepChartSeries = new Series();
+            stepChartSeries.Name = "Step chart";
+            stepChartSeries.ChartType = SeriesChartType.Line;
+            stepChartSeries.Points.DataBindXY(robotNums, stepsArray);
+            stepChartSeries.IsValueShownAsLabel = true;
+            stepChart.Series.Add(stepChartSeries);
+            ChartForm.Controls.Add(stepChart);
+            stepChart.Invalidate();
         }
 
 		void CreateButtonClick(object sender, EventArgs e)
@@ -558,5 +580,7 @@ namespace WindowsFormsApplication1
         {
 
         }
+
+
     }
 }
