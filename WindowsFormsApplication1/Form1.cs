@@ -436,7 +436,7 @@ namespace WindowsFormsApplication1
 
         public void GlobalMapInForm(Bitmap bmp)
         {
-            if (globalMapPictureBox.InvokeRequired)
+            if (robotMapPictureBox.InvokeRequired)
             {
                 RobotMap a = new RobotMap(GlobalMapInForm);
                 globalMapPictureBox.Invoke(a, new object[] { bmp });
