@@ -83,6 +83,7 @@ namespace WindowsFormsApplication1
         int labelLocationY = 50;
         int barShift = 40;
         Size textBoxSize = new Size(185, 40);
+        Size chartSize = new Size(400, 400);
 
         Pen emptyRectPen = new Pen(Color.Gray, lineWidth);       //линия пустой клетки
 		SolidBrush takenRectBrush = new SolidBrush(Color.Black); //зарисовка занятой клетки
@@ -190,6 +191,7 @@ namespace WindowsFormsApplication1
 			xTrackBarLabel.Text = String.Format ("X: {0}", x);
 			yTrackBarLabel.Text = String.Format ("Y: {0}", y);
             robotNumBarLabel.Text = String.Format("Количество {0}\nроботов:", robotNum);
+            robotNumTextBox.Text = "";
         } //сдвиг ползунка
 
 		void LoadButtonClick(object sender, EventArgs e)
@@ -296,19 +298,40 @@ namespace WindowsFormsApplication1
             ChartForm.Show();
 
             Chart stepChart = new Chart();
-            stepChart.Size = new Size(800, 800);
+            stepChart.Location = new Point(0, 0);
+            stepChart.Size = chartSize;
 
             ChartArea stepChartArea = new ChartArea();
             stepChart.ChartAreas.Add(stepChartArea);
 
             Series stepChartSeries = new Series();
             stepChartSeries.Name = "Step chart";
-            stepChartSeries.ChartType = SeriesChartType.Line;
+            stepChartSeries.ChartType = SeriesChartType.Column;
             stepChartSeries.Points.DataBindXY(robotNums, stepsArray);
             stepChartSeries.IsValueShownAsLabel = true;
             stepChart.Series.Add(stepChartSeries);
             ChartForm.Controls.Add(stepChart);
             stepChart.Invalidate();
+
+            Chart optimalPointChart = new Chart();
+            optimalPointChart.Location = new Point(chartSize.Width + 10, 0);
+            optimalPointChart.Size = chartSize;
+
+            ChartArea optimalPointChartArea = new ChartArea();
+            optimalPointChart.ChartAreas.Add(optimalPointChartArea);
+            Series ratioSeries1 = new Series();
+            ratioSeries1.ChartType = SeriesChartType.FastLine;
+            ratioSeries1.Points.DataBindXY(robotNums, stepsArray);
+            optimalPointChart.Series.Add(ratioSeries1);
+            Series ratioSeries2 = new Series();
+            ratioSeries2.ChartType = SeriesChartType.FastLine;
+            for (int i = 0; i < robotNums.Count(); i++)
+            {
+                ratioSeries2.Points.AddXY(robotNums[i], stepsArray[i] / robotNums[i]);
+            }
+            optimalPointChart.Series.Add(ratioSeries2);
+            ChartForm.Controls.Add(optimalPointChart);
+            optimalPointChart.Invalidate();
         }
 
 		void CreateButtonClick(object sender, EventArgs e)
