@@ -25,6 +25,7 @@ namespace WindowsFormsApplication1
 			InitializeComponent();
             InitializeComponents();
             InterfaceDraw();
+            EmptyEverything();
         }
 
         int x = 10;                                             // значения размерности
@@ -42,7 +43,7 @@ namespace WindowsFormsApplication1
         Thread map;                                             // поток для отрисовки карты с роботов
         ConcurrentQueue<List<(int x, int y)>> robotsCoordinate; // очередь для передачи координат робота между потоками
         delegate void RobotMap(Bitmap bmp);                     // для изменения пикчербокса из стороннег потока
-        delegate void robNumTextBoxDelegate(string resStr);
+        delegate void resultLabelDelegate(string resStr);
         int sleepTime = 200;
 
         int sideSize = 10;                                      // размер стороны квадрата
@@ -68,6 +69,7 @@ namespace WindowsFormsApplication1
         Label xTrackBarLabel = new Label ();
 		Label yTrackBarLabel = new Label ();
         Label robotNumBarLabel = new Label();
+        Label resultLabel = new Label();
 		TrackBar xTrackBar = new TrackBar ();
 		TrackBar yTrackBar = new TrackBar ();
         TrackBar robotNumBar = new TrackBar ();
@@ -75,14 +77,19 @@ namespace WindowsFormsApplication1
 
         CheckedListBox savedMaps = new CheckedListBox();
 
+        int formXBorderShift = 50;
+        int formYBorderShift = 180;
         Size buttonSize = new Size (100, 25);
         int buttonShift = 115;
         int buttonLocationY = 10;
+        int buttonNum = 5;
         Size labelSize = new Size(40, 40);
+        Size bigLabelSize = new Size(90, 40);
         int labelShift = 160;
         int labelLocationY = 50;
         int barShift = 40;
         Size textBoxSize = new Size(185, 40);
+        Size chartSize = new Size(400, 400);
 
         Pen emptyRectPen = new Pen(Color.Gray, lineWidth);       //линия пустой клетки
 		SolidBrush takenRectBrush = new SolidBrush(Color.Black); //зарисовка занятой клетки
@@ -128,7 +135,7 @@ namespace WindowsFormsApplication1
             xTrackBar.Minimum = 10;
             xTrackBar.Maximum = 100;
             xTrackBar.TickFrequency = 10;
-            xTrackBar.Scroll += TrackBarScroll;
+            xTrackBar.Scroll += SizeTrackBarScroll;
 
             yTrackBarLabel.Location = new Point(xTrackBarLabel.Location.X + labelShift, labelLocationY);
             yTrackBarLabel.Size = labelSize;
@@ -138,20 +145,23 @@ namespace WindowsFormsApplication1
             yTrackBar.Minimum = 10;
             yTrackBar.Maximum = 100;
             yTrackBar.TickFrequency = 10;
-            yTrackBar.Scroll += TrackBarScroll;
+            yTrackBar.Scroll += SizeTrackBarScroll;
 
             robotNumBarLabel.Location = new Point(yTrackBarLabel.Location.X + labelShift, labelLocationY);
-            robotNumBarLabel.Size = new Size(labelSize.Width * 2 + 10, labelSize.Height);
+            robotNumBarLabel.Size = bigLabelSize;
             robotNumBarLabel.Text = String.Format("Количество {0}\nроботов:", robotNum);
 
             robotNumBar.Location = new Point(robotNumBarLabel.Location.X +robotNumBarLabel.Size.Width, labelLocationY);
             robotNumBar.Minimum = 1;
             robotNumBar.Maximum = 15;
             robotNumBar.TickFrequency = 1;
-            robotNumBar.Scroll += TrackBarScroll;
+            robotNumBar.Scroll += RobotNumTrackBarScroll;
 
             robotNumTextBox.Location = new Point(robotNumBarLabel.Location.X, robotNumBarLabel.Location.Y + robotNumBarLabel.Size.Height + 5);
             robotNumTextBox.Size = textBoxSize;
+
+            resultLabel.Location = new Point(loadButton.Location.X, robotNumTextBox.Location.Y);
+            resultLabel.Size = bigLabelSize;
 
             savedMaps.CheckOnClick = true;
             savedMaps.SelectionMode = SelectionMode.One;
@@ -180,19 +190,26 @@ namespace WindowsFormsApplication1
             Controls.Add(startButton);
             Controls.Add(globalMapPictureBox);
             Controls.Add(robotNumTextBox);
+            Controls.Add(resultLabel);
         } //отрисовка элементов интерфейса
 
-        void TrackBarScroll(object sender, EventArgs e)
+        void SizeTrackBarScroll(object sender, EventArgs e)
 		{
 			x = xTrackBar.Value;
 			y = yTrackBar.Value;
-            robotNum = robotNumBar.Value;
 			xTrackBarLabel.Text = String.Format ("X: {0}", x);
 			yTrackBarLabel.Text = String.Format ("Y: {0}", y);
-            robotNumBarLabel.Text = String.Format("Количество {0}\nроботов:", robotNum);
+            EmptyEverything();
         } //сдвиг ползунка
 
-		void LoadButtonClick(object sender, EventArgs e)
+        void RobotNumTrackBarScroll(object sender, EventArgs e)
+        {
+            robotNum = robotNumBar.Value;
+            robotNumBarLabel.Text = String.Format("Количество {0}\nроботов:", robotNum);
+            //robotNumTextBox.Text = "";
+        }
+
+        void LoadButtonClick(object sender, EventArgs e)
 		{
             Controls.Remove(globalMapPictureBox);
 
@@ -213,7 +230,7 @@ namespace WindowsFormsApplication1
 
             y = file.Length;
             x = file[0].Length / 2;
-            CreateMap();
+            SetFormMaps();
 
             for (int i = 0; i < file.Length; i++)
             {
@@ -228,7 +245,9 @@ namespace WindowsFormsApplication1
                 }
             }
 
-            DrawMap();
+            EmptyRobotMap();
+            DrawGlobalMap();
+            DrawingRobotsMap();
             savedMaps.Items.Clear();
             Controls.Remove(savedMaps);
             Controls.Remove(savedMapsButton);
@@ -237,8 +256,8 @@ namespace WindowsFormsApplication1
             yTrackBar.Value = y;
             xTrackBarLabel.Text = String.Format("X: {0}", x);
             yTrackBarLabel.Text = String.Format("Y: {0}", y);
-            yTrackBar.Enabled = false;
-            xTrackBar.Enabled = false;
+            //yTrackBar.Enabled = false;
+            //xTrackBar.Enabled = false;
         }
 
         void SaveButtonClick(object sender, EventArgs e)
@@ -262,7 +281,10 @@ namespace WindowsFormsApplication1
             if (robotNumTextBox.Text == "")
             {
                 robotsCoordinate = new ConcurrentQueue<List<(int x, int y)>>();
-                os = new Thread(StartOS);
+                EmptyRobotMap();
+                if (prevCoordList != null)
+                    prevCoordList.Clear();
+                os = new Thread(StepOS);
                 os.Start();
                 map = new Thread(DrawingRobotsMap);
                 map.Start();
@@ -296,29 +318,62 @@ namespace WindowsFormsApplication1
             ChartForm.Show();
 
             Chart stepChart = new Chart();
-            stepChart.Size = new Size(800, 800);
+            stepChart.Location = new Point(0, 0);
+            stepChart.Size = chartSize;
 
             ChartArea stepChartArea = new ChartArea();
             stepChart.ChartAreas.Add(stepChartArea);
 
             Series stepChartSeries = new Series();
             stepChartSeries.Name = "Step chart";
-            stepChartSeries.ChartType = SeriesChartType.Line;
+            stepChartSeries.ChartType = SeriesChartType.Column;
             stepChartSeries.Points.DataBindXY(robotNums, stepsArray);
             stepChartSeries.IsValueShownAsLabel = true;
             stepChart.Series.Add(stepChartSeries);
             ChartForm.Controls.Add(stepChart);
             stepChart.Invalidate();
+
+            Chart optimalPointChart = new Chart();
+            optimalPointChart.Location = new Point(chartSize.Width + 10, 0);
+            optimalPointChart.Size = chartSize;
+
+            ChartArea optimalPointChartArea = new ChartArea();
+            optimalPointChart.ChartAreas.Add(optimalPointChartArea);
+            Series ratioSeries1 = new Series();
+            ratioSeries1.ChartType = SeriesChartType.FastLine;
+            ratioSeries1.Points.DataBindXY(robotNums, stepsArray);
+            optimalPointChart.Series.Add(ratioSeries1);
+            Series ratioSeries2 = new Series();
+            ratioSeries2.ChartType = SeriesChartType.FastLine;
+            for (int i = 0; i < robotNums.Count(); i++)
+            {
+                ratioSeries2.Points.AddXY(robotNums[i], stepsArray[i] / robotNums[i]);
+            }
+            optimalPointChart.Series.Add(ratioSeries2);
+            ChartForm.Controls.Add(optimalPointChart);
+            optimalPointChart.Invalidate();
         }
 
 		void CreateButtonClick(object sender, EventArgs e)
 		{
-			mapArray = new int[y, x];
-            robotMapArray = new int[y, x];
-            CreateMap();
+            EmptyEverything();
         } //нажатие на кнопку создания карты
 
-        void CreateMap()
+        void EmptyEverything()
+        {
+            mapArray = new int[y, x];
+            robotMapArray = new int[y, x];
+            startPointIsSet = false;
+            if (prevCoordList != null)
+                prevCoordList.Clear();
+            SetFormMaps();
+            EmptyGlobalMap();
+            EmptyRobotMap();
+            DrawGlobalMap();
+            DrawRobotMap();
+        }
+
+        /*void CreateMap()
         {
             this.Size = new Size(x * sideSize * 2 + 100 < buttonShift * 5 ? buttonShift * 5 : x * sideSize * 2 + 100, y * sideSize + 200);
             globalMapPictureBox.Size = new Size(x * sideSize + 1, y * sideSize + 1);
@@ -339,6 +394,41 @@ namespace WindowsFormsApplication1
                 }
             }
             DrawMap();
+        }*/
+
+        void SetFormMaps()
+        {
+            this.Size = new Size(x * sideSize * 2 + formXBorderShift < buttonShift * buttonNum ? buttonShift * buttonNum : x * sideSize * 2 + formXBorderShift, y * sideSize + formYBorderShift);
+            globalMapPictureBox.Size = new Size(x * sideSize + 1, y * sideSize + 1);
+            globalMap = new Bitmap(x * sideSize + 1, y * sideSize + 1);
+            robotMapPictureBox.Size = new Size(x * sideSize + 1, y * sideSize + 1);
+            robotMapPictureBox.Location = new Point(globalMapPictureBox.Location.X + x * sideSize + sideSize, globalMapPictureBox.Location.Y);
+            robotMap = new Bitmap(x * sideSize + 1, y * sideSize + 1);
+            Controls.Add(robotMapPictureBox);
+            globalMapGraphics = Graphics.FromImage(globalMap);
+            robotMapGraphics = Graphics.FromImage(robotMap);
+        }
+
+        void EmptyGlobalMap()
+        {
+            for (int i = 0; i < y; i++)
+            {
+                for (int j = 0; j < x; j++)
+                {
+                    mapArray[i, j] = 0;
+                }
+            }
+        }
+
+        void EmptyRobotMap()
+        {
+            for (int i = 0; i < y; i++)
+            {
+                for (int j = 0; j < x; j++)
+                {
+                    robotMapArray[i, j] = 2;
+                }
+            }
         }
 
         void RobotMapArrayUpdate(List <(int x, int y)> coordList)
@@ -373,7 +463,7 @@ namespace WindowsFormsApplication1
             prevCoordList = coordList;
         } //обновление карты новыми данными от роботов
 
-        void DrawMap()
+        /*void DrawMap()
         {
             for (int i = 0; i < y; i++)
             {
@@ -403,7 +493,47 @@ namespace WindowsFormsApplication1
 
             GlobalMapInForm(globalMap);
             RobotMapInForm(robotMap);
-        } //отрисовка карты
+        } //отрисовка карты*/
+
+        void DrawGlobalMap()
+        {
+            for (int i = 0; i < y; i++)
+            {
+                for (int j = 0; j < x; j++)
+                {
+                    if (mapArray[i, j] == 0)
+                        globalMapGraphics.FillRectangle(takenRectBrush, j * (sideSize), i * (sideSize), sideSize + 1, sideSize + 1);
+                    if (mapArray[i, j] == 1)
+                        globalMapGraphics.FillRectangle(emptyRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
+                    if (mapArray[i, j] == 2)
+                        globalMapGraphics.FillRectangle(startPointRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
+                    globalMapGraphics.DrawRectangle(emptyRectPen, j * (sideSize), i * (sideSize), sideSize, sideSize);
+                }
+            }
+            GlobalMapInForm(globalMap);
+        }
+
+        void DrawRobotMap()
+        {
+            for (int i = 0; i < y; i++)
+            {
+                for (int j = 0; j < x; j++)
+                {
+                    if (robotMapArray[i, j] == 0)
+                        robotMapGraphics.FillRectangle(takenRectBrush, j * (sideSize), i * (sideSize), sideSize + 1, sideSize + 1);
+                    if (robotMapArray[i, j] == 1)
+                        robotMapGraphics.FillRectangle(emptyRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
+                    if (robotMapArray[i, j] == 2)
+                        robotMapGraphics.FillRectangle(unknownRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
+                    if (robotMapArray[i, j] == 3)
+                        robotMapGraphics.FillRectangle(robotRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
+                    if (mapArray[i, j] == 2)
+                        robotMapGraphics.FillRectangle(startPointRectBrush, j * sideSize, i * sideSize, sideSize + 1, sideSize + 1);
+                    robotMapGraphics.DrawRectangle(emptyRectPen, j * (sideSize), i * (sideSize), sideSize, sideSize);
+                }
+            }
+            RobotMapInForm(robotMap);
+        }
 
         void RobotNumStringParse()
         {
@@ -447,7 +577,7 @@ namespace WindowsFormsApplication1
                         globalMapGraphics.DrawRectangle(emptyRectPen, squareX * (sideSize), squareY * (sideSize), sideSize, sideSize);
                     }
 
-                    globalMapPictureBox.Image = globalMap;
+                    GlobalMapInForm(globalMap);
                 }
 			}
 		}
@@ -486,34 +616,49 @@ namespace WindowsFormsApplication1
             os.Abort();
         }
 
+        private void StepOS()
+        {
+            OpSystem OS = new OpSystem(robotNum, mapArray, startPoint);
+            bool end = true;
+            while (end)
+            {
+                robotsCoordinate.Enqueue(OS.CalculationStep(out end));
+                Thread.Sleep(sleepTime);
+            }
+            List<(int, int)> temp = new List<(int, int)>();
+            robotsCoordinate.Enqueue(temp); // отправляем пустой список, в качестве индикатора об окончании работы алгоритма
+            os.Abort();
+        }
+
         private void DrawingRobotsMap()
         {
-            
+            steps = 0;
             while (true)
             {
                 if (!robotsCoordinate.TryDequeue(out var coorList)) continue; // проверка очереди
                 if (!coorList.Any()) break; // проверка на окончание передачи
                 RobotMapArrayUpdate(coorList);
-                DrawMap();
-                //steps++;
+                DrawRobotMap();
+                steps++;
             }
-            ResultOutput(String.Format("Роботы: {0} Шаги: {1}", robotNum, steps));
+            ResultOutput(String.Format("Роботов: {0} Тактов: {1}", robotNum, steps));
+            map.Abort();
         }
 
         public void ResultOutput(string s)
         {
-            if (robotNumTextBox.InvokeRequired)
+            if (resultLabel.InvokeRequired)
             {
-                robNumTextBoxDelegate tB = new robNumTextBoxDelegate(ResultOutput);
-                robotNumTextBox.Invoke(tB, new object[] { s });
+                resultLabelDelegate tB = new resultLabelDelegate(ResultOutput);
+                resultLabel.Invoke(tB, new object[] { s });
             }
             else
             {
-                robotNumTextBox.Text = s;
+                resultLabel.Text = s;
             }
         }
 
-        public void RobotMapInForm(Bitmap bmp)
+        private void RobotMapInForm(Bitmap bmp)
         {
             if (robotMapPictureBox.InvokeRequired)
             {
@@ -526,7 +671,7 @@ namespace WindowsFormsApplication1
             }
         }
 
-        public void GlobalMapInForm(Bitmap bmp)
+        private void GlobalMapInForm(Bitmap bmp)
         {
             if (robotMapPictureBox.InvokeRequired)
             {
