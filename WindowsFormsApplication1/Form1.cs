@@ -53,6 +53,8 @@ namespace WindowsFormsApplication1
         int[] robotNums;
         int steps;
         int[] stepsArray;
+        List<int> distances;
+        List<int>[] distancesArray;
 
 		PictureBox globalMapPictureBox = new PictureBox();
         PictureBox robotMapPictureBox = new PictureBox();
@@ -90,6 +92,8 @@ namespace WindowsFormsApplication1
         int barShift = 40;
         Size textBoxSize = new Size(185, 40);
         Size chartSize = new Size(400, 400);
+        Size smallChartSize = new Size(200, 200);
+        int chartShift = 10;
 
         Pen emptyRectPen = new Pen(Color.Gray, lineWidth);       //линия пустой клетки
 		SolidBrush takenRectBrush = new SolidBrush(Color.Black); //зарисовка занятой клетки
@@ -212,6 +216,8 @@ namespace WindowsFormsApplication1
         void LoadButtonClick(object sender, EventArgs e)
 		{
             Controls.Remove(globalMapPictureBox);
+            Controls.Remove(robotMapPictureBox);
+            Controls.Remove(resultLabel);
 
             string[] filesNames = Directory.GetFiles(@"C:\MARS maps");
 
@@ -247,11 +253,13 @@ namespace WindowsFormsApplication1
 
             EmptyRobotMap();
             DrawGlobalMap();
-            DrawingRobotsMap();
+            DrawRobotMap();
             savedMaps.Items.Clear();
             Controls.Remove(savedMaps);
             Controls.Remove(savedMapsButton);
             Controls.Add(globalMapPictureBox);
+            Controls.Add(robotMapPictureBox);
+            Controls.Add(resultLabel);
             xTrackBar.Value = x;
             yTrackBar.Value = y;
             xTrackBarLabel.Text = String.Format("X: {0}", x);
@@ -278,7 +286,7 @@ namespace WindowsFormsApplication1
 
         void StartButtonClick(object sender, EventArgs e)
         {
-            if (robotNumTextBox.Text == "")
+            if (robotNumTextBox.Text == "") //первый режим
             {
                 robotsCoordinate = new ConcurrentQueue<List<(int x, int y)>>();
                 EmptyRobotMap();
@@ -289,15 +297,15 @@ namespace WindowsFormsApplication1
                 map = new Thread(DrawingRobotsMap);
                 map.Start();
             }
-            else
+            else //второй режим
             {
-                sleepTime = 0;
+                //sleepTime = 0;
                 RobotNumStringParse();
                 stepsArray = new int[robotNums.Count()];
+                distancesArray = new List<int>[robotNums.Count()];
                 for (int i = 0; i < robotNums.Count(); i++)
                 {
-                    robotNum = robotNums[i];  
-                    robotsCoordinate = new ConcurrentQueue<List<(int x, int y)>>();
+                    robotNum = robotNums[i];
                     os = new Thread(StartOS);
                     os.Start();
                     while (os.IsAlive)
@@ -305,6 +313,8 @@ namespace WindowsFormsApplication1
 
                     }
                     stepsArray[i] = steps;
+                    distancesArray[i] = distances;
+                    Console.WriteLine(distances.Count());
                 }
                 StepChartDraw();
             }
@@ -333,7 +343,7 @@ namespace WindowsFormsApplication1
             ChartForm.Controls.Add(stepChart);
             stepChart.Invalidate();
 
-            Chart optimalPointChart = new Chart();
+            /*Chart optimalPointChart = new Chart();
             optimalPointChart.Location = new Point(chartSize.Width + 10, 0);
             optimalPointChart.Size = chartSize;
 
@@ -351,7 +361,57 @@ namespace WindowsFormsApplication1
             }
             optimalPointChart.Series.Add(ratioSeries2);
             ChartForm.Controls.Add(optimalPointChart);
-            optimalPointChart.Invalidate();
+            optimalPointChart.Invalidate();*/
+
+            Chart[] distancesCharts = new Chart[distancesArray.Count()];
+            for (int i = 0; i < distancesCharts.Count(); i++)
+            {
+                distancesCharts[i] = new Chart();
+                distancesCharts[i].Location = new Point((i<3?i:i-3)*(smallChartSize.Width) + chartSize.Width, i < 3 ? 0 : smallChartSize.Height);
+                distancesCharts[i].Size = smallChartSize;
+
+                ChartArea distanceArea = new ChartArea();
+                distanceArea.AxisX.Minimum = 0;
+                distanceArea.AxisX.Maximum = robotNums.Max() + 1;
+                distancesCharts[i].ChartAreas.Add(distanceArea);
+
+
+                int[] robotSeries = new int[robotNums[i]];
+                for (int j = 0; j < robotNums[i]; j++)
+                {
+                    robotSeries[j] = j + 1;
+                }
+                Series distanceSeries = new Series();
+                distanceSeries.ChartType = SeriesChartType.Column;
+                distanceSeries.IsValueShownAsLabel = true;
+                distanceSeries.Points.DataBindXY(robotSeries, distancesArray[i]);
+                distancesCharts[i].Series.Add(distanceSeries);
+                ChartForm.Controls.Add(distancesCharts[i]);
+                distancesCharts[i].Invalidate();
+            }
+
+            /*Chart distanceCharts = new Chart();
+            distanceCharts.Location = new Point(chartSize.Width + chartShift, 0);
+            ChartArea[] distanceChartsAreas = new ChartArea[robotNums.Count()];
+            Series[] distanceChartsSeries = new Series[robotNums.Count()];
+            for (int i = 0; i < robotNums.Count(); i++)
+            {
+                distanceChartsAreas[i] = new ChartArea();
+
+                distanceChartsSeries[i] = new Series();
+                distanceChartsSeries[i].ChartType = SeriesChartType.Column;
+                int[] robotSeries = new int[robotNums[i]];
+                for (int j = 0; j < robotNums[i]; j++)
+                {
+                    robotSeries[j] = j+1;
+                }
+                distanceChartsSeries[i].Points.DataBindXY(robotSeries, distancesArray[i]);
+
+                distanceCharts.ChartAreas.Add(distanceChartsAreas[i]);
+                distanceCharts.Series.Add(distanceChartsSeries[i]);
+            }
+            ChartForm.Controls.Add(distanceCharts);
+            distanceCharts.Invalidate();*/
         }
 
 		void CreateButtonClick(object sender, EventArgs e)
@@ -603,16 +663,8 @@ namespace WindowsFormsApplication1
         private void StartOS()
         {
             OpSystem OS = new OpSystem(robotNum, mapArray, startPoint);
-            bool end = true;
-            steps = 0;
-            while (end)
-            {
-                robotsCoordinate.Enqueue(OS.CalculationStep(out end));
-                Thread.Sleep(sleepTime);
-                steps++;
-            }
-            List<(int, int)> temp = new List<(int, int)>();
-            robotsCoordinate.Enqueue(temp); // отправляем пустой список, в качестве индикатора об окончании работы алгоритма
+            steps = OS.Start(out List<int> dist);
+            distances = dist;
             os.Abort();
         }
 
@@ -632,7 +684,7 @@ namespace WindowsFormsApplication1
 
         private void DrawingRobotsMap()
         {
-            steps = 0;
+            steps = -1;
             while (true)
             {
                 if (!robotsCoordinate.TryDequeue(out var coorList)) continue; // проверка очереди
