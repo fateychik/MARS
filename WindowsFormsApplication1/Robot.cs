@@ -28,7 +28,6 @@ namespace WindowsFormsApplication1
             ratingTasks = new Dictionary<string, int>();
         }
 
-
         public (int xCoord, int yCoord) GetCoordinates(bool type) //0-prev 1-current
         {
             if (type)
