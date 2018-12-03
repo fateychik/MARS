@@ -17,6 +17,16 @@ namespace WindowsFormsApplication1
 
         Dictionary<int, string> sorted;
 
+        List<(string name, int robNum)> discovered;
+        List<(string name, int robNum)> visited;
+        List<(string name, int robNum)> newDiscovered;
+        List<string[]> edges;
+
+        System.Diagnostics.Process process;
+        string programmExecute = "\"C:\\Program Files (x86)\\Graphviz2.38\\bin\\dot\"";
+        string programmArguments = "-Tpng \"C:\\MARS maps\\graph.txt\" -o\"C:\\MARS maps\\graph.png\"";
+        string graphFile = @"C:\MARS maps\graph.txt";
+
         public OpSystem(int robotsNumber, int[,] fullMap, (int x, int y) point)
         {
             robots = new Robot[robotsNumber];
@@ -27,7 +37,9 @@ namespace WindowsFormsApplication1
             robotMap = new int[fullMap.GetLength(0), fullMap.GetLength(1)];
             tasks = new List<(int x, int y)>();
             graph = new Graph();
+            discovered = new List<(string name, int robNum)>();
             graph.AddVertex($"{point.x}_{point.y}");
+            GraphFileStart($"{point.x}_{point.y}");
             free = new List<int>();
             for (int i = 1; i < robotsNumber; i++)  // объяевение всех роботов, как свободных
                 free.Add(i);
@@ -36,6 +48,20 @@ namespace WindowsFormsApplication1
             busy.Add(0);                            // для того, чтобы начать первый цикл работы
 
             sorted = new Dictionary<int, string>(); // hz
+
+            process = new System.Diagnostics.Process();
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.FileName = programmExecute;
+            process.StartInfo.Arguments = programmArguments;
+        }
+
+        private void GraphFileStart(string startPoint)
+        {
+            string startPointString = String.Format("\"{0}\" [label=\"{0}\\nStart\\npoint\"];", startPoint, "}");
+            string[] startLines = { "digraph MapGraph {", startPointString };
+            System.IO.File.WriteAllLines(graphFile, startLines);   
         }
 
         public List<(int, int)> CalculationStep(out bool end)
@@ -43,6 +69,7 @@ namespace WindowsFormsApplication1
             TerritoryInvestigation();
             GiveTask();
             CoordIncrement();
+            GraphFileUpdate();
 
             List<(int, int)> temp = new List<(int, int)>();
             foreach (var i in robots)
@@ -50,6 +77,35 @@ namespace WindowsFormsApplication1
 
             end = busy.Any() || tasks.Any();
             return temp;
+        }
+
+        private void GraphFileUpdate()
+        {
+            var lines = System.IO.File.ReadAllLines(graphFile);
+            System.IO.File.WriteAllLines(graphFile, lines.Take(lines.Length - 1).ToArray());
+
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(graphFile, true))
+            {
+
+                for (int i = 0; i < edges.Count; i++)
+                {
+                    file.WriteLine("\"{0}\"->\"{1}\";", edges[i][0], edges[i][1]);
+                }
+
+                for (int i = 0; i < newDiscovered.Count; i++)
+                {
+                    file.WriteLine("\"{0}\" [label=\"{0}\\nfound: {1}\\ndiscovered\"];", newDiscovered[i].name, newDiscovered[i].robNum);
+                }
+
+                for (int i = 0; i < visited.Count; i++)
+                {
+                    file.WriteLine("\"{0}\" [label=\"{0}\\nfound: {1}\\ndiscovered: {2}\"];", visited[i].name, discovered.Find(item => item.name == visited[i].name).robNum, visited[i].robNum);
+                }
+
+                file.WriteLine("}");
+            }
+            process.Start();
+            process.WaitForExit();
         }
 
         public int Start(out List<int> distance)
@@ -74,11 +130,17 @@ namespace WindowsFormsApplication1
         {
             var buf = new List<int>();
 
+            visited = new List<(string name, int robNum)>();
+            edges = new List<string[]>();
+            newDiscovered = new List<(string name, int robNum)>();
+
             foreach (int num in busy)
             {
                 if (robots[num].path.Any()) continue;                                         // опрашиваем только граничных роботов
 
                 (int x, int y) coordinates = robots[num].GetCoordinates(true);
+
+                visited.Add(($"{coordinates.x}_{coordinates.y}", num)); //обновление описания точки инфомацией о роботе, посетившим её
 
                 for (int n = -1; n < 2; n++)
                 {
@@ -90,13 +152,16 @@ namespace WindowsFormsApplication1
 
                         int i = coordinates.x + n <= 0 ? 0 : coordinates.x + n;
                         int j = coordinates.y + m <= 0 ? 0 : coordinates.y + m;
-                        
+
                         if ((i, j) != robots[num].GetCoordinates(false) && fullMap[i, j] != 0 && robotMap[i, j] != 1)
                         {
                             robotMap[i, j] = fullMap[i, j];                                   // отрисовываем карту
                             graph.AddVertex($"{i}_{j}");                                      // добавление вершины в граф лабиринта
                             graph.AddEdge($"{i}_{j}", $"{coordinates.x}_{coordinates.y}", 1); // добавение ребра
                             tasks.Add((i, j));                                                // добавление задачи
+                            newDiscovered.Add(($"{i}_{j}", num));
+                            string[] edgeCoords = {$"{coordinates.x}_{coordinates.y}", $"{i}_{j}"};
+                            edges.Add(edgeCoords);
                         }
                     }
                 }
@@ -108,6 +173,8 @@ namespace WindowsFormsApplication1
                 free.Add(i);
                 busy.Remove(i);
             }
+
+            discovered.AddRange(newDiscovered);
         }
                 
         private void GiveTask()
