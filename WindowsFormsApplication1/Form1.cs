@@ -276,7 +276,7 @@ namespace WindowsFormsApplication1
 
         void SaveButtonClick(object sender, EventArgs e)
 		{
-            string fileName = System.IO.Path.Combine(@"c:\MARS maps", System.IO.Path.GetRandomFileName());
+            string fileName = System.IO.Path.Combine(@"C:\MARS maps", System.IO.Path.GetRandomFileName());
 
             using (StreamWriter map = new StreamWriter(fileName + ".txt", true, System.Text.Encoding.Default))
             {
