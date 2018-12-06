@@ -26,9 +26,9 @@ namespace WindowsFormsApplication1
         List<string[]> edges;
 
         System.Diagnostics.Process process;
-        string programmExecute = "\"E:\\Program Files\\Graphviz2.38\\bin\\dot\"";
-        string programmArguments = "-Tpng \"E:\\MARS maps\\graph.txt\" -o\"E:\\MARS maps\\graph.png\"";
-        string graphFile = @"E:\MARS maps\graph.txt";
+        string programmExecute = "\"C:\\Program Files (x86)\\Graphviz2.38\\bin\\dot\"";
+        string programmArguments = "-Tpng \"C:\\MARS maps\\graph.txt\" -o\"C:\\MARS maps\\graph.png\"";
+        string graphFile = @"C:\MARS maps\graph.txt";
 
         private void GraphFileStart(string startPoint)
         {
@@ -79,6 +79,7 @@ namespace WindowsFormsApplication1
             graph = new Graph();
             discovered = new List<(string name, int robNum)>();
             graph.AddVertex($"{point.x}_{point.y}");
+            GraphFileStart($"{point.x}_{point.y}");
             free = new List<int>();
             for (int i = 1; i < robotsNumber; i++)  // объяевение всех роботов, как свободных
                 free.Add(i);
@@ -89,6 +90,7 @@ namespace WindowsFormsApplication1
             sorted = new Dictionary<int, string>(); // hz
 
             GraphFileStart($"{point.x}_{point.y}");
+
             process = new System.Diagnostics.Process();
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.UseShellExecute = false;
@@ -112,7 +114,7 @@ namespace WindowsFormsApplication1
             end = busy.Any() || tasks.Any();
             return temp;
         }
-        
+
         public int Start(out List<int> distance)
         {
             int counter = 0;
@@ -148,6 +150,7 @@ namespace WindowsFormsApplication1
 
                 visited.Add(($"{coordinates.x}_{coordinates.y}", num));                       //обновление описания точки инфомацией о роботе, посетившим её
 
+
                 for (int n = -1; n < 2; n++)
                 {
                     for (int m = - 1; m < 2; m++)
@@ -160,6 +163,7 @@ namespace WindowsFormsApplication1
                         int j = coordinates.y + m <= 0 ? 0 : coordinates.y + m;
 
                         if ((i, j) != robots[num].GetCoordinates(false) && fullMap[i, j] != 0)
+
                         {
                             if (robotMap[i, j] == 1)                                          // если мы обнаружили ранее найденную вершину, к которой нет связи
                             {

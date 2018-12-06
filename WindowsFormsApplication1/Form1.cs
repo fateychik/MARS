@@ -99,7 +99,7 @@ namespace WindowsFormsApplication1
         Size chartSize = new Size(400, 400);
         Size smallChartSize = new Size(200, 200);
 
-        string picturePath = @"E:\MARS maps\graph.png";
+        string picturePath = @"C:\MARS maps\graph.png";
 
         Pen emptyRectPen = new Pen(Color.Gray, lineWidth);       //линия пустой клетки
 		SolidBrush takenRectBrush = new SolidBrush(Color.Black); //зарисовка занятой клетки
@@ -276,7 +276,7 @@ namespace WindowsFormsApplication1
 
         void SaveButtonClick(object sender, EventArgs e)
 		{
-            string fileName = System.IO.Path.Combine(@"c:\MARS maps", System.IO.Path.GetRandomFileName());
+            string fileName = System.IO.Path.Combine(@"C:\MARS maps", System.IO.Path.GetRandomFileName());
 
             using (StreamWriter map = new StreamWriter(fileName + ".txt", true, System.Text.Encoding.Default))
             {
