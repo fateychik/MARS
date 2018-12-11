@@ -105,6 +105,7 @@ namespace WindowsFormsApplication1
             sorted = new Dictionary<int, string>(); // hz
 
             fileText = new List<string>();
+
             GraphFileStart($"{point.x}_{point.y}");
 
             process = new System.Diagnostics.Process();
