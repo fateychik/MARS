@@ -29,39 +29,54 @@ namespace WindowsFormsApplication1
         string programmExecute = "\"C:\\Program Files (x86)\\Graphviz2.38\\bin\\dot\"";
         string programmArguments = "-Tpng \"C:\\MARS maps\\graph.txt\" -o\"C:\\MARS maps\\graph.png\"";
         string graphFile = @"C:\MARS maps\graph.txt";
+        List<string> fileText;
 
         private void GraphFileStart(string startPoint)
         {
             string startPointString = String.Format("\"{0}\" [label=\"{0}\\nStart\\npoint\"];", startPoint, "}");
             string[] startLines = { "digraph MapGraph {", startPointString };
-            System.IO.File.WriteAllLines(graphFile, startLines);
+            fileText.Add(@"digraph MapGraph {");
+            fileText.Add(startPointString);
+            //System.IO.File.WriteAllLines(graphFile, startLines);
         }
 
         private void GraphFileUpdate()
         {
-            var lines = System.IO.File.ReadAllLines(graphFile);
-            System.IO.File.WriteAllLines(graphFile, lines.Take(lines.Length - 1).ToArray());
+            //var lines = System.IO.File.ReadAllLines(graphFile);
+            //System.IO.File.WriteAllLines(graphFile, lines.Take(lines.Length - 1).ToArray());
 
+            for (int i = 0; i < edges.Count; i++)
+            {
+            //file.WriteLine("\"{0}\"->\"{1}\";", edges[i][0], edges[i][1]);
+                fileText.Add(String.Format("\"{0}\"->\"{1}\";", edges[i][0], edges[i][1]));
+            }
+
+            for (int i = 0; i < newDiscovered.Count; i++)
+            {
+            //file.WriteLine("\"{0}\" [label=\"{0}\\nfound: {1}\\ndiscovered\"];", newDiscovered[i].name, newDiscovered[i].robNum);
+                fileText.Add(String.Format("\"{0}\" [label=\"{0}\\nfound: {1}\\ndiscovered\"];", newDiscovered[i].name, newDiscovered[i].robNum));
+            }
+
+            for (int i = 0; i < visited.Count; i++)
+            {
+                //file.WriteLine("\"{0}\" [label=\"{0}\\nfound: {1}\\ndiscovered: {2}\"];", visited[i].name, discovered.Find(item => item.name == visited[i].name).robNum, visited[i].robNum);
+                fileText.Add(String.Format("\"{0}\" [label=\"{0}\\nfound: {1}\\ndiscovered: {2}\"];", visited[i].name, discovered.Find(item => item.name == visited[i].name).robNum, visited[i].robNum));
+            }
+
+            //file.WriteLine("}");
+            System.IO.File.WriteAllLines(graphFile, fileText);
+            System.IO.File.AppendAllText(graphFile, "}");
+            /*System.IO.File.Create(graphFile);
+            System.IO.File.
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(graphFile, true))
             {
 
-                for (int i = 0; i < edges.Count; i++)
+                for (int i = 0; i < fileText.Count; i++)
                 {
-                    file.WriteLine("\"{0}\"->\"{1}\";", edges[i][0], edges[i][1]);
+                    file.WriteLine(fileText[i]);
                 }
-
-                for (int i = 0; i < newDiscovered.Count; i++)
-                {
-                    file.WriteLine("\"{0}\" [label=\"{0}\\nfound: {1}\\ndiscovered\"];", newDiscovered[i].name, newDiscovered[i].robNum);
-                }
-
-                for (int i = 0; i < visited.Count; i++)
-                {
-                    file.WriteLine("\"{0}\" [label=\"{0}\\nfound: {1}\\ndiscovered: {2}\"];", visited[i].name, discovered.Find(item => item.name == visited[i].name).robNum, visited[i].robNum);
-                }
-
                 file.WriteLine("}");
-            }
+            }*/
             process.Start();
             process.WaitForExit();
         }
@@ -79,7 +94,7 @@ namespace WindowsFormsApplication1
             graph = new Graph();
             discovered = new List<(string name, int robNum)>();
             graph.AddVertex($"{point.x}_{point.y}");
-            GraphFileStart($"{point.x}_{point.y}");
+            //GraphFileStart($"{point.x}_{point.y}");
             free = new List<int>();
             for (int i = 1; i < robotsNumber; i++)  // объяевение всех роботов, как свободных
                 free.Add(i);
@@ -88,6 +103,8 @@ namespace WindowsFormsApplication1
             busy.Add(0);                            // для того, чтобы начать первый цикл работы
 
             sorted = new Dictionary<int, string>(); // hz
+
+            fileText = new List<string>();
 
             GraphFileStart($"{point.x}_{point.y}");
 
