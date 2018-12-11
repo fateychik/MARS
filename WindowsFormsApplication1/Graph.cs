@@ -78,7 +78,7 @@ namespace WindowsFormsApplication1
         {
             //Console.WriteLine("\nAdding edge " + A + B + " with weight " + w);
 
-            if (A == B || !vertex.ContainsKey(A) || !vertex.ContainsKey(B) || w == 0)
+            if (A == B || !vertex.ContainsKey(A) || !vertex.ContainsKey(B) || w == 0 || ContainsEdge(A, B))
             {
                 //Console.WriteLine("\nnet");
                 return;
@@ -94,6 +94,12 @@ namespace WindowsFormsApplication1
 
             adjMatrix[vertex[A]][vertex[B]] = 0;
             //Console.WriteLine("the edge has been deleted");
+        }
+
+        public bool ContainsEdge(string A, string B)
+        {
+            if (adjMatrix[vertex[A]][vertex[B]] == 0) return false;
+            else return true;
         }
 
         public T Adjacency<T>(string A, string B)

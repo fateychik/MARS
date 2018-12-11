@@ -52,13 +52,14 @@ namespace WindowsFormsApplication1
         static int lineWidth = 1;                               // ширина линии квадрата
 
         int robotNum = 1;
-        int[] robotNums;
+        int[] robotAmo;
         int steps;
         int[] stepsArray;
         List<int> distances;
         List<int>[] distancesArray;
 
-        Form GraphForm;
+        Form graphForm;
+        Panel graphPanel;
         PictureBox graphPictureBox;
 
         PictureBox globalMapPictureBox = new PictureBox();
@@ -98,6 +99,7 @@ namespace WindowsFormsApplication1
         Size textBoxSize = new Size(185, 40);
         Size chartSize = new Size(400, 400);
         Size smallChartSize = new Size(200, 200);
+        Size graphFormSize = new Size(800, 1000);
 
         string picturePath = @"C:\MARS maps\graph.png";
 
@@ -276,7 +278,7 @@ namespace WindowsFormsApplication1
 
         void SaveButtonClick(object sender, EventArgs e)
 		{
-            string fileName = System.IO.Path.Combine(@"c:\MARS maps", System.IO.Path.GetRandomFileName());
+            string fileName = System.IO.Path.Combine(@"C:\MARS maps", System.IO.Path.GetRandomFileName());
 
             using (StreamWriter map = new StreamWriter(fileName + ".txt", true, System.Text.Encoding.Default))
             {
@@ -309,11 +311,11 @@ namespace WindowsFormsApplication1
             else //второй режим
             {
                 RobotNumStringParse();
-                stepsArray = new int[robotNums.Count()];
-                distancesArray = new List<int>[robotNums.Count()];
-                for (int i = 0; i < robotNums.Count(); i++)
+                stepsArray = new int[robotAmo.Count()];
+                distancesArray = new List<int>[robotAmo.Count()];
+                for (int i = 0; i < robotAmo.Count(); i++)
                 {
-                    robotNum = robotNums[i];
+                    robotNum = robotAmo[i];
                     os = new Thread(StartOS);
                     os.Start();
                     while (os.IsAlive)
@@ -344,27 +346,29 @@ namespace WindowsFormsApplication1
             Series stepChartSeries = new Series();
             stepChartSeries.Name = "Step chart";
             stepChartSeries.ChartType = SeriesChartType.Column;
-            stepChartSeries.Points.DataBindXY(robotNums, stepsArray);
+            stepChartSeries.Points.DataBindXY(robotAmo, stepsArray);
             stepChartSeries.IsValueShownAsLabel = true;
             stepChart.Series.Add(stepChartSeries);
             ChartForm.Controls.Add(stepChart);
             stepChart.Invalidate();
 
             Chart[] distancesCharts = new Chart[distancesArray.Count()];
+            int k = 0;
             for (int i = 0; i < distancesCharts.Count(); i++)
             {
                 distancesCharts[i] = new Chart();
-                distancesCharts[i].Location = new Point((i<3?i:i-3)*(smallChartSize.Width) + chartSize.Width, i < 3 ? 0 : smallChartSize.Height);
+                //distancesCharts[i].Location = new Point((i<3?i:i-3)*(smallChartSize.Width) + chartSize.Width, i < 3 ? 0 : smallChartSize.Height);
+                distancesCharts[i].Location = new Point(k * smallChartSize.Width + chartSize.Width, i / 3 * smallChartSize.Height);
                 distancesCharts[i].Size = smallChartSize;
 
                 ChartArea distanceArea = new ChartArea();
                 distanceArea.AxisX.Minimum = 0;
-                distanceArea.AxisX.Maximum = robotNums.Max() + 1;
+                distanceArea.AxisX.Maximum = robotAmo.Max() + 1;
                 distancesCharts[i].ChartAreas.Add(distanceArea);
 
 
-                int[] robotSeries = new int[robotNums[i]];
-                for (int j = 0; j < robotNums[i]; j++)
+                int[] robotSeries = new int[robotAmo[i]];
+                for (int j = 0; j < robotAmo[i]; j++)
                 {
                     robotSeries[j] = j + 1;
                 }
@@ -375,23 +379,59 @@ namespace WindowsFormsApplication1
                 distancesCharts[i].Series.Add(distanceSeries);
                 ChartForm.Controls.Add(distancesCharts[i]);
                 distancesCharts[i].Invalidate();
+
+                k=k<2?k+1:0;
             }
+
+            Chart stepSumChart = new Chart();
+            stepSumChart.Location = new Point(stepChart.Location.X, stepChart.Location.Y + stepChart.Size.Height);
+            stepSumChart.Size = chartSize;
+
+            ChartArea stepSumChartArea = new ChartArea();
+            stepSumChart.ChartAreas.Add(stepSumChartArea);
+
+            int[] distSumArray = new int[distancesArray.Count()];
+            for (int i = 0; i < distSumArray.Count(); i++)
+            {
+                distSumArray[i] = distancesArray[i].Sum();
+            }
+
+            Series stepSumChartSeries = new Series();
+            stepSumChartSeries.Name = "Sum step chart";
+            stepSumChartSeries.ChartType = SeriesChartType.Column;
+            stepSumChartSeries.Points.DataBindXY(robotAmo, distSumArray);
+            stepSumChartSeries.IsValueShownAsLabel = true;
+            stepSumChart.Series.Add(stepSumChartSeries);
+            ChartForm.Controls.Add(stepSumChart);
+            stepSumChart.Invalidate();
+
+            ChartForm.AutoSize = true;
         }
 
         void GraphFormCreate()
         {
-            GraphForm = new Form();
-            GraphForm.Text = "Граф карты";
-            GraphForm.AutoSizeMode = AutoSizeMode;
-            GraphForm.Show();
+            graphForm = new Form();
+            graphForm.Text = "Граф карты";
+            graphForm.Size = graphFormSize;
+            //graphForm.AutoSizeMode = AutoSizeMode;
+            graphForm.Show();
+
+            graphPanel = new Panel();
+            graphPanel.Location = new Point(0, 0);
+            graphPanel.Size = new Size(graphFormSize.Width - 20, graphFormSize.Height - 50);
+            graphPanel.AutoScroll = true;
+
+            //imagePanel.AutoSize = false;
+            graphForm.Controls.Add(graphPanel);
 
             graphPictureBox = new PictureBox();
             graphPictureBox.SizeMode = PictureBoxSizeMode.AutoSize;
             graphPictureBox.Location = new Point(0, 0);
-            GraphForm.Controls.Add(graphPictureBox);
+            graphPanel.Controls.Add(graphPictureBox);
+            //graphForm.Controls.Add(graphPictureBox);
         }
 
-		void CreateButtonClick(object sender, EventArgs e)
+        void CreateButtonClick(object sender, EventArgs e)
 		{
             EmptyEverything();
         } //нажатие на кнопку создания карты
@@ -520,10 +560,10 @@ namespace WindowsFormsApplication1
         void RobotNumStringParse()
         {
             string[] robotNumsStrings = robotNumTextBox.Text.Split(' ');
-            robotNums = new int[robotNumsStrings.Count()];
+            robotAmo = new int[robotNumsStrings.Count()];
             for (int i = 0; i < robotNumsStrings.Count(); i++)
             {
-                robotNums[i] = int.Parse(robotNumsStrings[i]);
+                robotAmo[i] = int.Parse(robotNumsStrings[i]);
             }
         }
 
@@ -685,7 +725,7 @@ namespace WindowsFormsApplication1
             else
             {
                 graphPictureBox.Image = img;
-                GraphForm.AutoSize = true;
+                //graphForm.AutoSize = true;
             }
         }
 
