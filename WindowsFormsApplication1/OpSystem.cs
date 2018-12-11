@@ -182,13 +182,12 @@ namespace WindowsFormsApplication1
                         if ((i, j) != robots[num].GetCoordinates(false) && fullMap[i, j] != 0)
 
                         {
-                            string[] edgeCoords;
 
                             if (robotMap[i, j] == 1)                                          // если мы обнаружили ранее найденную вершину, к которой нет связи
                             {
                                 graph.AddEdge($"{i}_{j}", $"{coordinates.x}_{coordinates.y}", 1);
-                                edgeCoords = { $"{coordinates.x}_{coordinates.y}", $"{i}_{j}"};
-                                edges.Add(edgeCoords);
+                                string[] edgeCoordsTemp = { $"{coordinates.x}_{coordinates.y}", $"{i}_{j}"};
+                                edges.Add(edgeCoordsTemp);
                                 if (tasks.Contains((i, j))) tasks.Remove((i, j));
                                 continue;
                             }
@@ -198,7 +197,7 @@ namespace WindowsFormsApplication1
                             graph.AddEdge($"{i}_{j}", $"{coordinates.x}_{coordinates.y}", 1); // добавение ребра
                             tasks.Add((i, j));                                                // добавление задачи
                             newDiscovered.Add(($"{i}_{j}", num));
-                            edgeCoords = {$"{coordinates.x}_{coordinates.y}", $"{i}_{j}"};
+                            string[] edgeCoords = {$"{coordinates.x}_{coordinates.y}", $"{i}_{j}"};
                             edges.Add(edgeCoords);
                         }
                     }
